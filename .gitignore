@@ -6,3 +6,4 @@ mbed-os
 BUILD
 CMakeLists.txt
 cmake-*/
+.idea/
