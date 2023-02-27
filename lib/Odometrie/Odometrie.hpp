@@ -1,7 +1,7 @@
 #ifndef odomotrie_h
 #define odomotrie_h
 
-#include "math.h"
+#include <cmath>
 class Odometrie{
     // Attributs
     int tick_md;

@@ -1,5 +1,5 @@
 #include "Odometrie.hpp"
-#include "math.h"
+#include <cmath>
 
 // Constructeur :
 Odometrie::Odometrie(){
