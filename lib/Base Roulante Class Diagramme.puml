@@ -1,0 +1,110 @@
+@startuml
+'https://plantuml.com/class-diagram
+package enumerate{
+    enum half_bridge_t{
+    a
+    b
+    c
+    }
+    enum state_t{
+    enable
+    busy
+    }
+}
+
+
+package "Classes Base roulante" <<Node>> {
+    class Brushless {
+        -- Constructors & Destructor --
+        Brushless(PinList list_pins);
+        Brushless();
+        \~ Brushless();
+        -- Methods --
+        bool init();
+        .. Controller ..
+        setPID();
+        setVelocity(double velocity_ref);
+        setDutyCycle(half_bridge_t half_bridge);
+        .. Current sensors ..
+        double getCurrent(half_bridge_t half_bridge);
+        .. Hall sensors ..
+        double getVelocity();
+        int32_t getTick();
+        void resetTick();
+        -- Periodic processing --
+        [ticker] PIDControl(); // 100 Hz
+
+        == Fields ==
+        + state_t state;
+        - timer_velocity; //ms
+
+    }
+    note bottom of Brushless
+        Classe servant à commander en vitesse un moteur Brushless
+    end note
+
+    note right of Brushless::"Brushless(PinList list_pins)"
+            PWM_A_H, PWM_A_L,
+            PWM_B_H, PWM_B_L,
+            PWM_C_H, PWM_C_L,
+            HALL_1, HALL_2, HALL_3,
+            Current_A,  Current_B, Current_C
+    end note
+
+    note left of Brushless::state
+        Pour activer, ou désactiver l'asservissement.
+    end note
+
+    class Robot {
+
+    }
+
+    class Odometer {
+        {field}
+
+        {method}
+        -- Constructors --
+        Odometer(Brushless motorR, Brushless motorL);
+        Odometer();
+        -- Mutators --
+
+        -- Accessors --
+
+        -- Methods --
+        - bool init(Brushless motorR, Brushless motorL);
+
+    }
+}
+object motorR {
+    PWM_A_H = PC_6
+    PWM_A_L = PA_7
+    PWM_B_H = PC_7
+    PWM_B_L = PB_14
+    PWM_C_H = PC_8
+    PWM_C_L = PB_15
+    HALL_1 = PB_7
+    HALL_2 = PB_8
+    HALL_3 = PB_9
+    Current_A = PC_4
+    Current_B = PC_5
+    Current_C = PC_6
+}
+object motorL {
+    PWM_A_H = PA_8
+    PWM_A_L = PB_13
+    PWM_B_H = PA_9
+    PWM_B_L = PB_0
+    PWM_C_H = PA_10
+    PWM_C_L = PB_1
+    HALL_1 = PB_2
+    HALL_2 = PB_5
+    HALL_3 = PB_6
+    Current_A = PC_1
+    Current_B = PC_2
+    Current_C = PC_3
+}
+
+motorL ..> Brushless : instance (Timer 1)
+motorR ..> Brushless : instance (Timer 8)
+
+@enduml

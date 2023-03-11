@@ -68,7 +68,7 @@ ADD_DEFINITIONS(
   -DDEVICE_STDIO_MESSAGES=1
   -DDEVICE_USTICKER=1
   -DDEVICE_WATCHDOG=1
-  -DMBED_BUILD_TIMESTAMP=1677526911.39
+  -DMBED_BUILD_TIMESTAMP=1678374779.57
   -DSTM32F446xx
   -DTARGET_CORTEX
   -DTARGET_CORTEX_M
@@ -169,12 +169,35 @@ INCLUDE_DIRECTORIES(
   mbed-os/cmsis/CMSIS_5
   mbed-os/cmsis
   mbed-os
+  lib/Robot
+  lib/Odometer
+  lib/BrushlessEirbot
+  lib
+  CubeMx/Inc
+  CubeMx
   C:/Users/leova/OneDrive/Eirbot/Coupe 23/eirbot-2023-2A/roulante/Mbed/mbed-os
   .
   )
 
 # executable Mbed
 ADD_EXECUTABLE(Mbed
+  CubeMx/Inc/gpio.h
+  CubeMx/Inc/main.h
+  CubeMx/Inc/stm32f4xx_hal_conf.h
+  CubeMx/Inc/stm32f4xx_it.h
+  CubeMx/Inc/tim.h
+  CubeMx/Src/gpio.c
+  CubeMx/Src/main.c
+  CubeMx/Src/stm32f4xx_hal_msp.c
+  CubeMx/Src/stm32f4xx_it.c
+  CubeMx/Src/system_stm32f4xx.c
+  CubeMx/Src/tim.c
+  lib/BrushlessEirbot/BrushlessEirbot.cpp
+  lib/BrushlessEirbot/BrushlessEirbot.hpp
+  lib/Odometer/Odometer.cpp
+  lib/Odometer/Odometer.hpp
+  lib/Robot/Robot.cpp
+  lib/Robot/Robot.hpp
   mbed-os/cmsis/CMSIS_5/CMSIS/RTOS2/Include/cmsis_os2.h
   mbed-os/cmsis/CMSIS_5/CMSIS/RTOS2/Include/os_tick.h
   mbed-os/cmsis/CMSIS_5/CMSIS/RTOS2/RTX/Config/RTX_Config.c
@@ -871,6 +894,7 @@ ADD_EXECUTABLE(Mbed
   mbed-os/targets/TARGET_STM/us_ticker.c
   mbed-os/targets/TARGET_STM/us_ticker_defines.h
   mbed-os/targets/TARGET_STM/watchdog_api.c
+  mbed_config.h
   mbed_config.h
   src/main.cpp
   )

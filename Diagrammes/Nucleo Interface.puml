@@ -1,0 +1,47 @@
+@startuml
+'https://plantuml.com/fr/class-diagram
+
+'--------------------------------------------------------
+'Instance
+
+
+class Nucleo{
+    + bufferLidar
+    parseLidar()
+}
+
+class Lidar{
+    + angle;
+    + distance;
+}
+
+Entity Pompe{
+    bool pompe();
+}
+
+Entity RecuperateurGateau{
+    bool recuperation();
+}
+
+Entity Deguisement{
+    bool deployment();
+}
+
+Entity Canon{
+    bool shoot();
+}
+
+
+'--------------------------------------------------------
+'Connectique
+
+Nucleo --> Pompe : Logical
+Nucleo --> Deguisement : Logical
+Nucleo --> Canon : Logical
+Nucleo --> RecuperateurGateau : Logical
+
+Lidar --> Nucleo : UART TX
+Lidar <-- Nucleo : UART RX
+Lidar --> Nucleo : Interrupt
+@enduml
+

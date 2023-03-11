@@ -1,0 +1,61 @@
+@startuml
+'https://plantuml.com/class-diagram
+package "Structures et méthodes élémentaires" <<Folder>>{
+object hall_t {
+    bool h1;
+    bool h2;
+    bool h3;
+    char h123;
+    char prev_h123;
+    int16_t tickS;
+    int32_t tickP;
+}
+object PWM_t {
+    bool aH;
+    bool aL;
+    bool bH;
+    bool bL;
+    bool cH;
+    bool cL;
+    bool sense;
+}
+object dataSpeed_t {
+    int16_t speed_ref;
+    int16_t speed;
+    int16_t error;
+    int16_t prev_error;
+    int16_t cmd;
+    int16_t prev_cmd;
+    int16_t cmdsat;
+    int16_t prev_cmdsat;
+}
+object PID_t {
+    const float Kp;
+    const float w_i;
+    const float Te;
+    const float a0;
+    const float a1;
+}
+
+object Méthodes_élémentaires{
+    void setDutyCycle(PWM,data)
+    void decodeHall(hall,PWM)
+    void updateOutput(PWM)
+    int16_t calculateSpeed(hall)
+    void writeCommand(PWM,data)
+}
+note right of Méthodes_élémentaires
+setDutyCycle : applique le bon rapport cyclique sur les demi-pont
+decodeHall : lit les capteurs à effet hall et interprète
+updateOutput : met à jour la PWM par la lecture des capteurs à effet Hall (IMPORTANT)
+calculateSpeed : calcul la vitesse de rotation
+writeCommand : applique la PWM et le sens de la séquence pour les commutations
+end note
+
+
+
+}
+
+
+
+@enduml
