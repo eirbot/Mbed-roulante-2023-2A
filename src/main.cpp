@@ -2,15 +2,13 @@
 #include "mbed.h"
 #include "SerialPlot.hpp"
 // ============= DEFINITIONS =================
-double i = 10.;
-double j = 30.;
+volatile double i = 10.;
+volatile double j = 30.;
 double t = 0.;
 BufferedSerial pc(USBTX, USBRX, 115200);
 
-#define NB 2
-const double* variables[NB]={&i, &j};
+SerialPlot debugCom(&pc, 100ms);
 
-SerialPlot debugCom(&pc, variables, NB, 100ms);
 
 // ============= FUNCTION =================
 
@@ -18,6 +16,7 @@ SerialPlot debugCom(&pc, variables, NB, 100ms);
 int main() {
     std::string s = "Bienvenu !\n";
     pc.write(s.c_str(), s.length());
+    debugCom.setVariables(&i, &j);
     debugCom.run();
     while (true) {
         i = sin(t);
