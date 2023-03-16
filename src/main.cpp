@@ -1,27 +1,34 @@
 // ============= INCLUDES =================
 #include "mbed.h"
-#include "SerialPlot.hpp"
+#include "tim.h"
 // ============= DEFINITIONS =================
-volatile double i = 10.;
-volatile double j = 30.;
-double t = 0.;
-BufferedSerial pc(USBTX, USBRX, 115200);
 
-SerialPlot debugCom(&pc, 100ms);
+DigitalOut led(LED1);
 
 
-// ============= FUNCTION =================
 
 // ============= MAIN =================
 int main() {
-    std::string s = "Bienvenu !\n";
-    pc.write(s.c_str(), s.length());
-    debugCom.setVariables(&i, &j);
-    debugCom.run();
+//    motor.setDutyCycle();
+    led.write(0);
+
+    MX_TIM1_Init();
+
+    HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
+    HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_1);
+    HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
+    HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_2);
+    HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);
+    HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_3);
+
+    TIM1->CCR1=25; TIM1->CCR2=35; TIM1->CCR3=45;
+    led.write(1);
+
+
+
     while (true) {
-        i = sin(t);
-        j = cos(t);
-        t = t+0.1;
-        ThisThread::sleep_for(1ms);
+        led = !led;
+        ThisThread::sleep_for(1s);
     }
+
 }
