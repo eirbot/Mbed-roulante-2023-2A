@@ -16,10 +16,8 @@ BrushlessEirbot::BrushlessEirbot(position position_motor, float wheelDiameterMm)
     // Initialisation des structures
     hall = {.h1=0, .h2=0, .h3=0, .h123=0, .prev_h123=0, .ticks=0};
     PWM = {.aH=1, .aL=0, .bH=1, .bL=0, .cH=0, .cL=0, .sens=clockwise};
-    data = {.speed_ref=0, .speed=0, .error=0, .prev_error=0, .cmd=0, .prev_cmd=0, .cmdsat=10, .prev_cmdsat=0};
 
     _tickerController.attach(callback(this, &BrushlessEirbot::_routineController), TeUsController);
-    _tickerHallSecure.attach(callback(this, &BrushlessEirbot::_routineHallSecure), TeUsHallSecure);
 
     if (_positionMotor == Left) {
         // Configuration des Hall Sensors
@@ -133,15 +131,15 @@ double BrushlessEirbot::getVelocity(unitVelocity unit) const {
     }
 }
 
-void BrushlessEirbot::setPI(float Kp, float wi, std::chrono::microseconds TeUsController) {
-    TeUsController = TeUsController;
-    double Te = (double) (TeUsController.count() / 1e-6);
+void BrushlessEirbot::setPI(float Kp, float wi, std::chrono::microseconds Te_chrono) {
+    TeUsController = Te_chrono;
+    float Te = (float) (TeUsController.count() / 1e-6);
     controller = new PIController(Kp, wi, Te);
 }
 
-void BrushlessEirbot::setPID(float Kp, float wi, float wb, float wh, std::chrono::microseconds TeUsController) {
-    TeUsController = TeUsController;
-    double Te = (double) (TeUsController.count() / 1e-6);
+void BrushlessEirbot::setPID(float Kp, float wi, float wb, float wh, std::chrono::microseconds Te_chrono) {
+    TeUsController = Te_chrono;
+    float Te = (float) (TeUsController.count() / 1e-6);
     controller = new PIDController(Kp, wi, wb, wh, Te);
 }
 
@@ -269,30 +267,30 @@ void BrushlessEirbot::updateOutput() {
  *                              Méthodes asservissements
  * *******************************************************************************/
 
-void BrushlessEirbot::setDutyCycle() {
-    /*
-     * Impose le rapport cyclique pour régler l'intensité magnétique d'accroche du rotor.
-     */
-    if ((data.cmdsat >= 0) && (data.cmdsat <= DC_MAX))          // clockwise
-    {
-        PWM.sens = clockwise;
-        timerPWM->CCR1 = 25;
-        timerPWM->CCR2 = 35;
-        timerPWM->CCR3 = 45;
-    } else if ((data.cmdsat >= DC_MIN) && (data.cmdsat < 0))    // anti clockwise
-    {
-        PWM.sens = antiClockwise;
-        timerPWM->CCR1 = -data.cmdsat;
-        timerPWM->CCR2 = -data.cmdsat;
-        timerPWM->CCR3 = -data.cmdsat;
-    } else                                                      //error state -. PWM off
-    {
-        PWM.sens = clockwise;
-        timerPWM->CCR1 = 0;
-        timerPWM->CCR2 = 0;
-        timerPWM->CCR3 = 0;
-    }
-}
+//void BrushlessEirbot::setDutyCycle() {
+//    /*
+//     * Impose le rapport cyclique pour régler l'intensité magnétique d'accroche du rotor.
+//     */
+//    if ((data.cmdsat >= 0) && (data.cmdsat <= DC_MAX))          // clockwise
+//    {
+//        PWM.sens = clockwise;
+//        timerPWM->CCR1 = 25;
+//        timerPWM->CCR2 = 35;
+//        timerPWM->CCR3 = 45;
+//    } else if ((data.cmdsat >= DC_MIN) && (data.cmdsat < 0))    // anti clockwise
+//    {
+//        PWM.sens = antiClockwise;
+//        timerPWM->CCR1 = -data.cmdsat;
+//        timerPWM->CCR2 = -data.cmdsat;
+//        timerPWM->CCR3 = -data.cmdsat;
+//    } else                                                      //error state -. PWM off
+//    {
+//        PWM.sens = clockwise;
+//        timerPWM->CCR1 = 0;
+//        timerPWM->CCR2 = 0;
+//        timerPWM->CCR3 = 0;
+//    }
+//}
 
 int16_t BrushlessEirbot::calculateSpeed() {
     /*
@@ -335,10 +333,6 @@ void BrushlessEirbot::hallInterrupt() {
         PWM.cH = (hall.h1)  && (!hall.h3);
         PWM.cL = (!hall.h1) && (hall.h3);
     }
-}
-
-void BrushlessEirbot::_routineHallSecure() {
-    // TODO Verifier la bonne cohérence
 }
 
 void BrushlessEirbot::_routineController(){
