@@ -1,0 +1,92 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="_structdata_speed__t" xml:lang="fr">
+<title>Référence de la structure dataSpeed_t</title>
+<indexterm><primary>dataSpeed_t</primary></indexterm>
+<simplesect>
+    <title>Attributs publics    </title>
+        <itemizedlist>
+            <listitem><para>int32_t <link linkend="_structdata_speed__t_1a6a07c416d7b4341169e4a8a54773fc45">speed_ref</link></para>
+</listitem>
+            <listitem><para>int32_t <link linkend="_structdata_speed__t_1ae644429f42890c52e95b354fac13fdf3">speed</link></para>
+</listitem>
+            <listitem><para>int32_t <link linkend="_structdata_speed__t_1a2bc98cb210af919960ed0bd6eeeb9f4c">error</link></para>
+</listitem>
+            <listitem><para>int32_t <link linkend="_structdata_speed__t_1acd1e578f5a679e6785b0160d6c6fde50">prev_error</link></para>
+</listitem>
+            <listitem><para>int32_t <link linkend="_structdata_speed__t_1a4458616b0b2bd0b73a226c2dc7d5a5eb">cmd</link></para>
+</listitem>
+            <listitem><para>int32_t <link linkend="_structdata_speed__t_1a18350d192c0551e37d94c04a25db7551">prev_cmd</link></para>
+</listitem>
+            <listitem><para>int32_t <link linkend="_structdata_speed__t_1a62c5fa1dc7b74f5e28475e67da91efd1">cmdsat</link></para>
+</listitem>
+            <listitem><para>int32_t <link linkend="_structdata_speed__t_1a89372399715689e003241a654f05da4d">prev_cmdsat</link></para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<section>
+<title>Description détaillée</title>
+<para>
+Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00049">49</link> du fichier <link linkend="__brushless_eirbot_8hpp_source">BrushlessEirbot.hpp</link>.</para>
+</section>
+<section>
+<title>Documentation des données membres</title>
+<anchor xml:id="_structdata_speed__t_1a4458616b0b2bd0b73a226c2dc7d5a5eb"/><section>
+    <title>cmd</title>
+<indexterm><primary>cmd</primary><secondary>dataSpeed_t</secondary></indexterm>
+<indexterm><primary>dataSpeed_t</primary><secondary>cmd</secondary></indexterm>
+<para><computeroutput>int32_t dataSpeed_t::cmd</computeroutput></para><para>
+Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00056">56</link> du fichier <link linkend="__brushless_eirbot_8hpp_source">BrushlessEirbot.hpp</link>.</para>
+</section>
+<anchor xml:id="_structdata_speed__t_1a62c5fa1dc7b74f5e28475e67da91efd1"/><section>
+    <title>cmdsat</title>
+<indexterm><primary>cmdsat</primary><secondary>dataSpeed_t</secondary></indexterm>
+<indexterm><primary>dataSpeed_t</primary><secondary>cmdsat</secondary></indexterm>
+<para><computeroutput>int32_t dataSpeed_t::cmdsat</computeroutput></para><para>
+Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00058">58</link> du fichier <link linkend="__brushless_eirbot_8hpp_source">BrushlessEirbot.hpp</link>.</para>
+</section>
+<anchor xml:id="_structdata_speed__t_1a2bc98cb210af919960ed0bd6eeeb9f4c"/><section>
+    <title>error</title>
+<indexterm><primary>error</primary><secondary>dataSpeed_t</secondary></indexterm>
+<indexterm><primary>dataSpeed_t</primary><secondary>error</secondary></indexterm>
+<para><computeroutput>int32_t dataSpeed_t::error</computeroutput></para><para>
+Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00053">53</link> du fichier <link linkend="__brushless_eirbot_8hpp_source">BrushlessEirbot.hpp</link>.</para>
+</section>
+<anchor xml:id="_structdata_speed__t_1a18350d192c0551e37d94c04a25db7551"/><section>
+    <title>prev_cmd</title>
+<indexterm><primary>prev_cmd</primary><secondary>dataSpeed_t</secondary></indexterm>
+<indexterm><primary>dataSpeed_t</primary><secondary>prev_cmd</secondary></indexterm>
+<para><computeroutput>int32_t dataSpeed_t::prev_cmd</computeroutput></para><para>
+Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00057">57</link> du fichier <link linkend="__brushless_eirbot_8hpp_source">BrushlessEirbot.hpp</link>.</para>
+</section>
+<anchor xml:id="_structdata_speed__t_1a89372399715689e003241a654f05da4d"/><section>
+    <title>prev_cmdsat</title>
+<indexterm><primary>prev_cmdsat</primary><secondary>dataSpeed_t</secondary></indexterm>
+<indexterm><primary>dataSpeed_t</primary><secondary>prev_cmdsat</secondary></indexterm>
+<para><computeroutput>int32_t dataSpeed_t::prev_cmdsat</computeroutput></para><para>
+Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00059">59</link> du fichier <link linkend="__brushless_eirbot_8hpp_source">BrushlessEirbot.hpp</link>.</para>
+</section>
+<anchor xml:id="_structdata_speed__t_1acd1e578f5a679e6785b0160d6c6fde50"/><section>
+    <title>prev_error</title>
+<indexterm><primary>prev_error</primary><secondary>dataSpeed_t</secondary></indexterm>
+<indexterm><primary>dataSpeed_t</primary><secondary>prev_error</secondary></indexterm>
+<para><computeroutput>int32_t dataSpeed_t::prev_error</computeroutput></para><para>
+Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00054">54</link> du fichier <link linkend="__brushless_eirbot_8hpp_source">BrushlessEirbot.hpp</link>.</para>
+</section>
+<anchor xml:id="_structdata_speed__t_1ae644429f42890c52e95b354fac13fdf3"/><section>
+    <title>speed</title>
+<indexterm><primary>speed</primary><secondary>dataSpeed_t</secondary></indexterm>
+<indexterm><primary>dataSpeed_t</primary><secondary>speed</secondary></indexterm>
+<para><computeroutput>int32_t dataSpeed_t::speed</computeroutput></para><para>
+Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00051">51</link> du fichier <link linkend="__brushless_eirbot_8hpp_source">BrushlessEirbot.hpp</link>.</para>
+</section>
+<anchor xml:id="_structdata_speed__t_1a6a07c416d7b4341169e4a8a54773fc45"/><section>
+    <title>speed_ref</title>
+<indexterm><primary>speed_ref</primary><secondary>dataSpeed_t</secondary></indexterm>
+<indexterm><primary>dataSpeed_t</primary><secondary>speed_ref</secondary></indexterm>
+<para><computeroutput>int32_t dataSpeed_t::speed_ref</computeroutput></para><para>
+Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00050">50</link> du fichier <link linkend="__brushless_eirbot_8hpp_source">BrushlessEirbot.hpp</link>.</para>
+</section>
+<para>
+La documentation de cette structure a été générée à partir du fichier suivant :</para>
+lib/BrushlessEirbot/BrushlessEirbot.hpp</section>
+</section>

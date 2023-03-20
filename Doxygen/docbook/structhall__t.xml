@@ -1,0 +1,83 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="_structhall__t" xml:lang="fr">
+<title>Référence de la structure hall_t</title>
+<indexterm><primary>hall_t</primary></indexterm>
+<simplesect>
+    <title>Attributs publics    </title>
+        <itemizedlist>
+            <listitem><para>bool <link linkend="_structhall__t_1a4c6b5197e492f8370788b0f46ead9a52">h1</link></para>
+</listitem>
+            <listitem><para>bool <link linkend="_structhall__t_1abbf419bb337e6ca83d74c3b4e36178de">h2</link></para>
+</listitem>
+            <listitem><para>bool <link linkend="_structhall__t_1a1e68c55c2e0a8dc495a7aa39a6587dfd">h3</link></para>
+</listitem>
+            <listitem><para>char <link linkend="_structhall__t_1a27d21251b012f7870e294874877b868a">h123</link></para>
+</listitem>
+            <listitem><para>char <link linkend="_structhall__t_1a6af60d801851b2bc405fa487f211e4aa">prev_h123</link></para>
+</listitem>
+            <listitem><para>int16_t <link linkend="_structhall__t_1aec41ce76f22e0e7769c85c69f8c6f3db">tickS</link></para>
+</listitem>
+            <listitem><para>int32_t <link linkend="_structhall__t_1a0da8537dcead7627ab193c46f978e5d4">tickP</link></para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<section>
+<title>Description détaillée</title>
+<para>
+Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00027">27</link> du fichier <link linkend="__brushless_eirbot_8hpp_source">BrushlessEirbot.hpp</link>.</para>
+</section>
+<section>
+<title>Documentation des données membres</title>
+<anchor xml:id="_structhall__t_1a4c6b5197e492f8370788b0f46ead9a52"/><section>
+    <title>h1</title>
+<indexterm><primary>h1</primary><secondary>hall_t</secondary></indexterm>
+<indexterm><primary>hall_t</primary><secondary>h1</secondary></indexterm>
+<para><computeroutput>bool hall_t::h1</computeroutput></para><para>
+Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00028">28</link> du fichier <link linkend="__brushless_eirbot_8hpp_source">BrushlessEirbot.hpp</link>.</para>
+</section>
+<anchor xml:id="_structhall__t_1a27d21251b012f7870e294874877b868a"/><section>
+    <title>h123</title>
+<indexterm><primary>h123</primary><secondary>hall_t</secondary></indexterm>
+<indexterm><primary>hall_t</primary><secondary>h123</secondary></indexterm>
+<para><computeroutput>char hall_t::h123</computeroutput></para><para>
+Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00031">31</link> du fichier <link linkend="__brushless_eirbot_8hpp_source">BrushlessEirbot.hpp</link>.</para>
+</section>
+<anchor xml:id="_structhall__t_1abbf419bb337e6ca83d74c3b4e36178de"/><section>
+    <title>h2</title>
+<indexterm><primary>h2</primary><secondary>hall_t</secondary></indexterm>
+<indexterm><primary>hall_t</primary><secondary>h2</secondary></indexterm>
+<para><computeroutput>bool hall_t::h2</computeroutput></para><para>
+Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00029">29</link> du fichier <link linkend="__brushless_eirbot_8hpp_source">BrushlessEirbot.hpp</link>.</para>
+</section>
+<anchor xml:id="_structhall__t_1a1e68c55c2e0a8dc495a7aa39a6587dfd"/><section>
+    <title>h3</title>
+<indexterm><primary>h3</primary><secondary>hall_t</secondary></indexterm>
+<indexterm><primary>hall_t</primary><secondary>h3</secondary></indexterm>
+<para><computeroutput>bool hall_t::h3</computeroutput></para><para>
+Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00030">30</link> du fichier <link linkend="__brushless_eirbot_8hpp_source">BrushlessEirbot.hpp</link>.</para>
+</section>
+<anchor xml:id="_structhall__t_1a6af60d801851b2bc405fa487f211e4aa"/><section>
+    <title>prev_h123</title>
+<indexterm><primary>prev_h123</primary><secondary>hall_t</secondary></indexterm>
+<indexterm><primary>hall_t</primary><secondary>prev_h123</secondary></indexterm>
+<para><computeroutput>char hall_t::prev_h123</computeroutput></para><para>
+Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00032">32</link> du fichier <link linkend="__brushless_eirbot_8hpp_source">BrushlessEirbot.hpp</link>.</para>
+</section>
+<anchor xml:id="_structhall__t_1a0da8537dcead7627ab193c46f978e5d4"/><section>
+    <title>tickP</title>
+<indexterm><primary>tickP</primary><secondary>hall_t</secondary></indexterm>
+<indexterm><primary>hall_t</primary><secondary>tickP</secondary></indexterm>
+<para><computeroutput>int32_t hall_t::tickP</computeroutput></para><para>
+Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00035">35</link> du fichier <link linkend="__brushless_eirbot_8hpp_source">BrushlessEirbot.hpp</link>.</para>
+</section>
+<anchor xml:id="_structhall__t_1aec41ce76f22e0e7769c85c69f8c6f3db"/><section>
+    <title>tickS</title>
+<indexterm><primary>tickS</primary><secondary>hall_t</secondary></indexterm>
+<indexterm><primary>hall_t</primary><secondary>tickS</secondary></indexterm>
+<para><computeroutput>int16_t hall_t::tickS</computeroutput></para><para>
+Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00034">34</link> du fichier <link linkend="__brushless_eirbot_8hpp_source">BrushlessEirbot.hpp</link>.</para>
+</section>
+<para>
+La documentation de cette structure a été générée à partir du fichier suivant :</para>
+lib/BrushlessEirbot/BrushlessEirbot.hpp</section>
+</section>

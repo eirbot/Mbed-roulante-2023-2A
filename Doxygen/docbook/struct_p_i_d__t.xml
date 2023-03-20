@@ -1,0 +1,65 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="_struct_p_i_d__t" xml:lang="fr">
+<title>Référence de la structure PID_t</title>
+<indexterm><primary>PID_t</primary></indexterm>
+<simplesect>
+    <title>Attributs publics    </title>
+        <itemizedlist>
+            <listitem><para>const float <link linkend="_struct_p_i_d__t_1a38af795ea69abb4eaa108001a29e54a3">Kp</link></para>
+</listitem>
+            <listitem><para>const float <link linkend="_struct_p_i_d__t_1abbf3bea884af0dd750d210947d586128">w_i</link></para>
+</listitem>
+            <listitem><para>const float <link linkend="_struct_p_i_d__t_1a69b0f5372f3678cfb028a6540fbf2b89">Te</link></para>
+</listitem>
+            <listitem><para>const float <link linkend="_struct_p_i_d__t_1a26b545ab0392cc61918c6a07489a4dcb">a0</link></para>
+</listitem>
+            <listitem><para>const float <link linkend="_struct_p_i_d__t_1a5d775efdb7802dbcb8013580cae33b00">a1</link></para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<section>
+<title>Description détaillée</title>
+<para>
+Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00062">62</link> du fichier <link linkend="__brushless_eirbot_8hpp_source">BrushlessEirbot.hpp</link>.</para>
+</section>
+<section>
+<title>Documentation des données membres</title>
+<anchor xml:id="_struct_p_i_d__t_1a26b545ab0392cc61918c6a07489a4dcb"/><section>
+    <title>a0</title>
+<indexterm><primary>a0</primary><secondary>PID_t</secondary></indexterm>
+<indexterm><primary>PID_t</primary><secondary>a0</secondary></indexterm>
+<para><computeroutput>const float PID_t::a0</computeroutput></para><para>
+Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00067">67</link> du fichier <link linkend="__brushless_eirbot_8hpp_source">BrushlessEirbot.hpp</link>.</para>
+</section>
+<anchor xml:id="_struct_p_i_d__t_1a5d775efdb7802dbcb8013580cae33b00"/><section>
+    <title>a1</title>
+<indexterm><primary>a1</primary><secondary>PID_t</secondary></indexterm>
+<indexterm><primary>PID_t</primary><secondary>a1</secondary></indexterm>
+<para><computeroutput>const float PID_t::a1</computeroutput></para><para>
+Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00068">68</link> du fichier <link linkend="__brushless_eirbot_8hpp_source">BrushlessEirbot.hpp</link>.</para>
+</section>
+<anchor xml:id="_struct_p_i_d__t_1a38af795ea69abb4eaa108001a29e54a3"/><section>
+    <title>Kp</title>
+<indexterm><primary>Kp</primary><secondary>PID_t</secondary></indexterm>
+<indexterm><primary>PID_t</primary><secondary>Kp</secondary></indexterm>
+<para><computeroutput>const float PID_t::Kp</computeroutput></para><para>
+Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00063">63</link> du fichier <link linkend="__brushless_eirbot_8hpp_source">BrushlessEirbot.hpp</link>.</para>
+</section>
+<anchor xml:id="_struct_p_i_d__t_1a69b0f5372f3678cfb028a6540fbf2b89"/><section>
+    <title>Te</title>
+<indexterm><primary>Te</primary><secondary>PID_t</secondary></indexterm>
+<indexterm><primary>PID_t</primary><secondary>Te</secondary></indexterm>
+<para><computeroutput>const float PID_t::Te</computeroutput></para><para>
+Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00065">65</link> du fichier <link linkend="__brushless_eirbot_8hpp_source">BrushlessEirbot.hpp</link>.</para>
+</section>
+<anchor xml:id="_struct_p_i_d__t_1abbf3bea884af0dd750d210947d586128"/><section>
+    <title>w_i</title>
+<indexterm><primary>w_i</primary><secondary>PID_t</secondary></indexterm>
+<indexterm><primary>PID_t</primary><secondary>w_i</secondary></indexterm>
+<para><computeroutput>const float PID_t::w_i</computeroutput></para><para>
+Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00064">64</link> du fichier <link linkend="__brushless_eirbot_8hpp_source">BrushlessEirbot.hpp</link>.</para>
+</section>
+<para>
+La documentation de cette structure a été générée à partir du fichier suivant :</para>
+lib/BrushlessEirbot/BrushlessEirbot.hpp</section>
+</section>

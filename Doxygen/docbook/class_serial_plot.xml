@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="_class_serial_plot" xml:lang="fr">
+<title>Référence de la classe SerialPlot</title>
+<indexterm><primary>SerialPlot</primary></indexterm>
+<simplesect>
+    <title>Fonctions membres publiques    </title>
+        <itemizedlist>
+            <listitem><para><link linkend="_class_serial_plot_1a713bafe217c1085e217f86cff7cd5b41">SerialPlot</link> (BufferedSerial *pc, uint8_t number_variables, std::chrono::microseconds timeSample=10ms)</para>
+</listitem>
+            <listitem><para>void <link linkend="_class_serial_plot_1aefbf9ebc4e1a9b374545ba037e3c063b">run</link> ()</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<section>
+<title>Description détaillée</title>
+<para>
+Définition à la ligne <link linkend="__serial_plot_8hpp_source_1l00006">6</link> du fichier <link linkend="__serial_plot_8hpp_source">SerialPlot.hpp</link>.</para>
+</section>
+<section>
+<title>Documentation des constructeurs et destructeur</title>
+<anchor xml:id="_class_serial_plot_1a713bafe217c1085e217f86cff7cd5b41"/><section>
+    <title>SerialPlot()</title>
+<indexterm><primary>SerialPlot</primary><secondary>SerialPlot</secondary></indexterm>
+<indexterm><primary>SerialPlot</primary><secondary>SerialPlot</secondary></indexterm>
+<para><computeroutput>SerialPlot::SerialPlot (BufferedSerial * pc, uint8_t number_variables, std::chrono::microseconds timeSample = <computeroutput>10ms</computeroutput>
+)</computeroutput></para><para>
+Définition à la ligne <link linkend="__serial_plot_8cpp_source_1l00003">3</link> du fichier <link linkend="__serial_plot_8cpp_source">SerialPlot.cpp</link>.</para>
+</section>
+<anchor xml:id="_class_serial_plot_1ab229efae218b582fd97633c4e3e1621a"/><section>
+    <title>~SerialPlot()</title>
+<indexterm><primary>~SerialPlot</primary><secondary>SerialPlot</secondary></indexterm>
+<indexterm><primary>SerialPlot</primary><secondary>~SerialPlot</secondary></indexterm>
+<para><computeroutput>SerialPlot::~SerialPlot ( )</computeroutput></para><para>
+Définition à la ligne <link linkend="__serial_plot_8cpp_source_1l00020">20</link> du fichier <link linkend="__serial_plot_8cpp_source">SerialPlot.cpp</link>.</para>
+</section>
+</section>
+<section>
+<title>Documentation des fonctions membres</title>
+<anchor xml:id="_class_serial_plot_1aefbf9ebc4e1a9b374545ba037e3c063b"/><section>
+    <title>run()</title>
+<indexterm><primary>run</primary><secondary>SerialPlot</secondary></indexterm>
+<indexterm><primary>SerialPlot</primary><secondary>run</secondary></indexterm>
+<para><computeroutput>void SerialPlot::run ( )</computeroutput></para><para>
+Définition à la ligne <link linkend="__serial_plot_8cpp_source_1l00027">27</link> du fichier <link linkend="__serial_plot_8cpp_source">SerialPlot.cpp</link>.</para>
+</section>
+<para>
+La documentation de cette classe a été générée à partir des fichiers suivants :</para>
+lib/SerialPlot/SerialPlot.hpplib/SerialPlot/SerialPlot.cpp</section>
+</section>

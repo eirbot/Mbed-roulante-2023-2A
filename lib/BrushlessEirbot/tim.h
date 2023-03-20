@@ -44,8 +44,24 @@ extern TIM_HandleTypeDef htim8;
 
 
 void MX_TIM1_Init(void);
-void MX_TIM8_Init(void);
+/**TIM1 GPIO Configuration
+PB0     ------> TIM1_CH2N
+PB1     ------> TIM1_CH3N
+PB13     ------> TIM1_CH1N
+PA8     ------> TIM1_CH1
+PA9     ------> TIM1_CH2
+PA10     ------> TIM1_CH3
+*/
 
+void MX_TIM8_Init(void);
+/**TIM8 GPIO Configuration
+PA7     ------> TIM8_CH1N
+PB14     ------> TIM8_CH2N
+PB15     ------> TIM8_CH3N
+PC6     ------> TIM8_CH1
+PC7     ------> TIM8_CH2
+PC8     ------> TIM8_CH3
+*/
 void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 
 #ifdef __cplusplus

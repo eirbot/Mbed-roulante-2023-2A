@@ -17,7 +17,7 @@ void MX_TIM1_Init(void) {
     TIM_BreakDeadTimeConfigTypeDef sBreakDeadTimeConfig = {0};
 
     htim1.Instance = TIM1;
-    htim1.Init.Prescaler = 28 - 1;
+    htim1.Init.Prescaler = 59 - 1; // avec comme clock de référence 180MHz
     htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
     htim1.Init.Period = 100 - 1;
     htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -67,6 +67,14 @@ void MX_TIM1_Init(void) {
 
     HAL_TIM_MspPostInit(&htim1);
 
+    //PWM START TIMER1
+    HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
+    HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_1);
+    HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
+    HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_2);
+    HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);
+    HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_3);
+
 }
 
 /* TIM8 init function */
@@ -77,7 +85,7 @@ void MX_TIM8_Init(void) {
     TIM_BreakDeadTimeConfigTypeDef sBreakDeadTimeConfig = {0};
 
     htim8.Instance = TIM8;
-    htim8.Init.Prescaler = 28 - 1;
+    htim8.Init.Prescaler = 59 - 1; // avec comme clock de référence 180MHz
     htim8.Init.CounterMode = TIM_COUNTERMODE_UP;
     htim8.Init.Period = 100 - 1;
     htim8.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -127,15 +135,22 @@ void MX_TIM8_Init(void) {
 
     HAL_TIM_MspPostInit(&htim8);
 
+    //PWM START TIMER8
+    HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_1);
+    HAL_TIMEx_PWMN_Start(&htim8, TIM_CHANNEL_1);
+    HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_2);
+    HAL_TIMEx_PWMN_Start(&htim8, TIM_CHANNEL_2);
+    HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_3);
+    HAL_TIMEx_PWMN_Start(&htim8, TIM_CHANNEL_3);
 }
 
 void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *tim_baseHandle) {
     if (tim_baseHandle->Instance == TIM1) {
         /* TIM1 clock enable */
-        __HAL_RCC_TIM1_CLK_ENABLE();
+
     } else if (tim_baseHandle->Instance == TIM8) {
         /* TIM8 clock enable */
-        __HAL_RCC_TIM8_CLK_ENABLE();
+
     }
 }
 
@@ -144,6 +159,7 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef *timHandle) {
     if (timHandle->Instance == TIM1) {
         __HAL_RCC_GPIOB_CLK_ENABLE();
         __HAL_RCC_GPIOA_CLK_ENABLE();
+        __HAL_RCC_TIM1_CLK_ENABLE(); // Tudor
         /**TIM1 GPIO Configuration
         PB0     ------> TIM1_CH2N
         PB1     ------> TIM1_CH3N
@@ -170,6 +186,7 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef *timHandle) {
         __HAL_RCC_GPIOA_CLK_ENABLE();
         __HAL_RCC_GPIOB_CLK_ENABLE();
         __HAL_RCC_GPIOC_CLK_ENABLE();
+        __HAL_RCC_TIM8_CLK_ENABLE(); // Tudor
         /**TIM8 GPIO Configuration
         PA7     ------> TIM8_CH1N
         PB14     ------> TIM8_CH2N

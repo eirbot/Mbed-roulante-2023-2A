@@ -1,0 +1,83 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="_struct_p_w_m__t" xml:lang="fr">
+<title>Référence de la structure PWM_t</title>
+<indexterm><primary>PWM_t</primary></indexterm>
+<simplesect>
+    <title>Attributs publics    </title>
+        <itemizedlist>
+            <listitem><para>bool <link linkend="_struct_p_w_m__t_1a185488f489c9e16f59a87683c84cb010">aH</link></para>
+</listitem>
+            <listitem><para>bool <link linkend="_struct_p_w_m__t_1a72946ec62a259319bd18eb063c4cc7ea">aL</link></para>
+</listitem>
+            <listitem><para>bool <link linkend="_struct_p_w_m__t_1a97615500e83a21f137ac6c2ddb9c3c87">bH</link></para>
+</listitem>
+            <listitem><para>bool <link linkend="_struct_p_w_m__t_1a780ff75555677cb1347e8c031489d61e">bL</link></para>
+</listitem>
+            <listitem><para>bool <link linkend="_struct_p_w_m__t_1a8e82ac42695f2d2c239d6ae91338098f">cH</link></para>
+</listitem>
+            <listitem><para>bool <link linkend="_struct_p_w_m__t_1a2ce3fd165558d408c0fbac4c75b24167">cL</link></para>
+</listitem>
+            <listitem><para>rotationSens_t <link linkend="_struct_p_w_m__t_1a35ae3b8757ddbc782d242f5e33d493a7">sens</link></para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<section>
+<title>Description détaillée</title>
+<para>
+Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00038">38</link> du fichier <link linkend="__brushless_eirbot_8hpp_source">BrushlessEirbot.hpp</link>.</para>
+</section>
+<section>
+<title>Documentation des données membres</title>
+<anchor xml:id="_struct_p_w_m__t_1a185488f489c9e16f59a87683c84cb010"/><section>
+    <title>aH</title>
+<indexterm><primary>aH</primary><secondary>PWM_t</secondary></indexterm>
+<indexterm><primary>PWM_t</primary><secondary>aH</secondary></indexterm>
+<para><computeroutput>bool PWM_t::aH</computeroutput></para><para>
+Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00040">40</link> du fichier <link linkend="__brushless_eirbot_8hpp_source">BrushlessEirbot.hpp</link>.</para>
+</section>
+<anchor xml:id="_struct_p_w_m__t_1a72946ec62a259319bd18eb063c4cc7ea"/><section>
+    <title>aL</title>
+<indexterm><primary>aL</primary><secondary>PWM_t</secondary></indexterm>
+<indexterm><primary>PWM_t</primary><secondary>aL</secondary></indexterm>
+<para><computeroutput>bool PWM_t::aL</computeroutput></para><para>
+Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00041">41</link> du fichier <link linkend="__brushless_eirbot_8hpp_source">BrushlessEirbot.hpp</link>.</para>
+</section>
+<anchor xml:id="_struct_p_w_m__t_1a97615500e83a21f137ac6c2ddb9c3c87"/><section>
+    <title>bH</title>
+<indexterm><primary>bH</primary><secondary>PWM_t</secondary></indexterm>
+<indexterm><primary>PWM_t</primary><secondary>bH</secondary></indexterm>
+<para><computeroutput>bool PWM_t::bH</computeroutput></para><para>
+Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00042">42</link> du fichier <link linkend="__brushless_eirbot_8hpp_source">BrushlessEirbot.hpp</link>.</para>
+</section>
+<anchor xml:id="_struct_p_w_m__t_1a780ff75555677cb1347e8c031489d61e"/><section>
+    <title>bL</title>
+<indexterm><primary>bL</primary><secondary>PWM_t</secondary></indexterm>
+<indexterm><primary>PWM_t</primary><secondary>bL</secondary></indexterm>
+<para><computeroutput>bool PWM_t::bL</computeroutput></para><para>
+Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00043">43</link> du fichier <link linkend="__brushless_eirbot_8hpp_source">BrushlessEirbot.hpp</link>.</para>
+</section>
+<anchor xml:id="_struct_p_w_m__t_1a8e82ac42695f2d2c239d6ae91338098f"/><section>
+    <title>cH</title>
+<indexterm><primary>cH</primary><secondary>PWM_t</secondary></indexterm>
+<indexterm><primary>PWM_t</primary><secondary>cH</secondary></indexterm>
+<para><computeroutput>bool PWM_t::cH</computeroutput></para><para>
+Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00044">44</link> du fichier <link linkend="__brushless_eirbot_8hpp_source">BrushlessEirbot.hpp</link>.</para>
+</section>
+<anchor xml:id="_struct_p_w_m__t_1a2ce3fd165558d408c0fbac4c75b24167"/><section>
+    <title>cL</title>
+<indexterm><primary>cL</primary><secondary>PWM_t</secondary></indexterm>
+<indexterm><primary>PWM_t</primary><secondary>cL</secondary></indexterm>
+<para><computeroutput>bool PWM_t::cL</computeroutput></para><para>
+Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00045">45</link> du fichier <link linkend="__brushless_eirbot_8hpp_source">BrushlessEirbot.hpp</link>.</para>
+</section>
+<anchor xml:id="_struct_p_w_m__t_1a35ae3b8757ddbc782d242f5e33d493a7"/><section>
+    <title>sens</title>
+<indexterm><primary>sens</primary><secondary>PWM_t</secondary></indexterm>
+<indexterm><primary>PWM_t</primary><secondary>sens</secondary></indexterm>
+<para><computeroutput>rotationSens_t PWM_t::sens</computeroutput></para><para>
+Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00046">46</link> du fichier <link linkend="__brushless_eirbot_8hpp_source">BrushlessEirbot.hpp</link>.</para>
+</section>
+<para>
+La documentation de cette structure a été générée à partir du fichier suivant :</para>
+lib/BrushlessEirbot/BrushlessEirbot.hpp</section>
+</section>

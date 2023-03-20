@@ -181,8 +181,8 @@ INCLUDE_DIRECTORIES(
 
 # executable Mbed
 ADD_EXECUTABLE(Mbed
-  CubeMx/tim.c
-  CubeMx/tim.h
+        lib/BrushlessEirbot/tim.c
+        lib/BrushlessEirbot/tim.h
   lib/BrushlessEirbot/BrushlessEirbot.cpp
   lib/BrushlessEirbot/BrushlessEirbot.hpp
   lib/Odometer/Odometer.cpp

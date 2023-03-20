@@ -1,34 +1,34 @@
-// ============= INCLUDES =================
-#include "mbed.h"
-#include "tim.h"
-// ============= DEFINITIONS =================
+// ================================= INCLUDES ================================
+#include"mbed.h"
+#include "BrushlessEirbot.hpp"
+#include "SerialPlot.hpp"
 
+// ========================== Variables Globales ==============================
 DigitalOut led(LED1);
+BufferedSerial pc(USBTX, USBRX, 115200);
 
+BrushlessEirbot motorLeft(Left, 78);
+BrushlessEirbot motorRight(Right, 78);
 
+// ================================== DEBUG ==================================
+double i;
+double j;
+#define numberVariables 2
+double** SerialPlot::_variables = new double*[numberVariables]{&i, &j};
+SerialPlot debugger(&pc,numberVariables, 10ms);
 
-// ============= MAIN =================
+// ================================== MAIN ====================================
 int main() {
-//    motor.setDutyCycle();
+    debugger.run();
+
     led.write(0);
+    motorRight.displayPinOut();
 
-    MX_TIM1_Init();
+    motorRight.setVelocity(tick_s, 700);
 
-    HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
-    HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_1);
-    HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
-    HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_2);
-    HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);
-    HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_3);
-
-    TIM1->CCR1=25; TIM1->CCR2=35; TIM1->CCR3=45;
     led.write(1);
-
-
-
     while (true) {
         led = !led;
         ThisThread::sleep_for(1s);
     }
-
 }
