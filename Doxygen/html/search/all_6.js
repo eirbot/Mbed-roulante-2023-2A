@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['serialplot_0',['SerialPlot',['../class_serial_plot.html',1,'']]]
+  ['robot_0',['Robot',['../class_robot.html',1,'']]]
 ];

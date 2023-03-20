@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__p_i_controller_8cpp_source" xml:lang="fr">
+<title>PIController.cpp</title>
+<indexterm><primary>lib/BrushlessEirbot/PIController.cpp</primary></indexterm>
+<programlisting linenumbering="unnumbered"><anchor xml:id="__p_i_controller_8cpp_source_1l00001"/>00001 <emphasis role="comment">//</emphasis>
+<anchor xml:id="__p_i_controller_8cpp_source_1l00002"/>00002 <emphasis role="comment">//&#32;Created&#32;by&#32;leova&#32;on&#32;20/03/2023.</emphasis>
+<anchor xml:id="__p_i_controller_8cpp_source_1l00003"/>00003 <emphasis role="comment">//</emphasis>
+<anchor xml:id="__p_i_controller_8cpp_source_1l00004"/>00004 
+<anchor xml:id="__p_i_controller_8cpp_source_1l00005"/>00005 <emphasis role="preprocessor">#include&#32;&quot;PIController.h&quot;</emphasis>
+<anchor xml:id="__p_i_controller_8cpp_source_1l00006"/>00006 
+<anchor xml:id="__p_i_controller_8cpp_source_1l00007"/>00007 
+<anchor xml:id="__p_i_controller_8cpp_source_1l00008"/>00008 
+<anchor xml:id="__p_i_controller_8cpp_source_1l00009"/>00009 PIController::PIController(<emphasis role="keywordtype">double</emphasis>&#32;Kp,&#32;<emphasis role="keywordtype">double</emphasis>&#32;wi,&#32;<emphasis role="keywordtype">double</emphasis>&#32;Te)&#32;{
+<anchor xml:id="__p_i_controller_8cpp_source_1l00010"/>00010 &#32;&#32;&#32;&#32;_K&#32;=&#32;Kp&#32;*&#32;(wi&#32;*&#32;Te&#32;+&#32;2)&#32;/&#32;2;
+<anchor xml:id="__p_i_controller_8cpp_source_1l00011"/>00011 &#32;&#32;&#32;&#32;_a0&#32;=&#32;(wi&#32;*&#32;Te&#32;-&#32;2)&#32;/&#32;(wi&#32;*&#32;Te&#32;+&#32;2);
+<anchor xml:id="__p_i_controller_8cpp_source_1l00012"/>00012 
+<anchor xml:id="__p_i_controller_8cpp_source_1l00013"/>00013 &#32;&#32;&#32;&#32;_error&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<emphasis role="keywordtype">double</emphasis>[_delay&#32;+&#32;1]{0};
+<anchor xml:id="__p_i_controller_8cpp_source_1l00014"/>00014 
+<anchor xml:id="__p_i_controller_8cpp_source_1l00015"/>00015 &#32;&#32;&#32;&#32;_consigne&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<emphasis role="keywordtype">double</emphasis>[_delay&#32;+&#32;1]{0};
+<anchor xml:id="__p_i_controller_8cpp_source_1l00016"/>00016 }
+<anchor xml:id="__p_i_controller_8cpp_source_1l00017"/>00017 <emphasis role="keywordtype">double</emphasis>&#32;PIController::getOutput(<emphasis role="keywordtype">double</emphasis>&#32;error)&#32;{
+<anchor xml:id="__p_i_controller_8cpp_source_1l00018"/>00018 &#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(uint8_t&#32;i=_delay&#32;;&#32;i&#32;&lt;&#32;0&#32;;&#32;i--){
+<anchor xml:id="__p_i_controller_8cpp_source_1l00019"/>00019 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_error[i]&#32;=&#32;_error[i-1];
+<anchor xml:id="__p_i_controller_8cpp_source_1l00020"/>00020 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;_consigne[i]&#32;=&#32;_consigne[i-1];
+<anchor xml:id="__p_i_controller_8cpp_source_1l00021"/>00021 &#32;&#32;&#32;&#32;}
+<anchor xml:id="__p_i_controller_8cpp_source_1l00022"/>00022 &#32;&#32;&#32;&#32;_error[0]&#32;=&#32;error;
+<anchor xml:id="__p_i_controller_8cpp_source_1l00023"/>00023 &#32;&#32;&#32;&#32;_consigne[0]&#32;=&#32;_K*(_error[0]-_a0*_error[1]);
+<anchor xml:id="__p_i_controller_8cpp_source_1l00024"/>00024 
+<anchor xml:id="__p_i_controller_8cpp_source_1l00025"/>00025 &#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;_consigne[0];
+<anchor xml:id="__p_i_controller_8cpp_source_1l00026"/>00026 }
+<anchor xml:id="__p_i_controller_8cpp_source_1l00027"/>00027 
+<anchor xml:id="__p_i_controller_8cpp_source_1l00028"/>00028 PIController::~PIController()&#32;{
+<anchor xml:id="__p_i_controller_8cpp_source_1l00029"/>00029 &#32;&#32;&#32;&#32;<emphasis role="keyword">delete</emphasis>[]&#32;_error;
+<anchor xml:id="__p_i_controller_8cpp_source_1l00030"/>00030 &#32;&#32;&#32;&#32;<emphasis role="keyword">delete</emphasis>[]&#32;_consigne;
+<anchor xml:id="__p_i_controller_8cpp_source_1l00031"/>00031 }
+</programlisting></section>

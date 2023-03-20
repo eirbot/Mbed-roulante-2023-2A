@@ -1,0 +1,67 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="_class_p_i" xml:lang="fr">
+<title>Référence de la classe PI</title>
+<indexterm><primary>PI</primary></indexterm>
+<simplesect>
+    <title>Fonctions membres publiques    </title>
+        <itemizedlist>
+            <listitem><para><link linkend="_class_p_i_1aefedc84e19a8e67bcdcbfefd8dfc0ee4">PI</link> (double Kp, double wi, double Te)</para>
+</listitem>
+            <listitem><para>double <link linkend="_class_p_i_1a03a82aaff26e58686eddc64d89b378b8">getOutput</link> (double error)</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Attributs protégés    </title>
+        <itemizedlist>
+            <listitem><para>double <link linkend="_class_p_i_1a4049d39350a7192edc3c47d5c0a2d614">_K</link></para>
+</listitem>
+            <listitem><para>double <link linkend="_class_p_i_1aa37373b99dc589197e28074095bde55b">_a0</link></para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<section>
+<title>Description détaillée</title>
+<para>
+Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00061">61</link> du fichier <link linkend="__brushless_eirbot_8hpp_source">BrushlessEirbot.hpp</link>.</para>
+</section>
+<section>
+<title>Documentation des constructeurs et destructeur</title>
+<anchor xml:id="_class_p_i_1aefedc84e19a8e67bcdcbfefd8dfc0ee4"/><section>
+    <title>PI()</title>
+<indexterm><primary>PI</primary><secondary>PI</secondary></indexterm>
+<indexterm><primary>PI</primary><secondary>PI</secondary></indexterm>
+<para><computeroutput>PI::PI (double Kp, double wi, double Te)</computeroutput></para><para>
+Définition à la ligne <link linkend="__brushless_eirbot_8cpp_source_1l00385">385</link> du fichier <link linkend="__brushless_eirbot_8cpp_source">BrushlessEirbot.cpp</link>.</para>
+</section>
+</section>
+<section>
+<title>Documentation des fonctions membres</title>
+<anchor xml:id="_class_p_i_1a03a82aaff26e58686eddc64d89b378b8"/><section>
+    <title>getOutput()</title>
+<indexterm><primary>getOutput</primary><secondary>PI</secondary></indexterm>
+<indexterm><primary>PI</primary><secondary>getOutput</secondary></indexterm>
+<para><computeroutput>double PI::getOutput (double error)</computeroutput></para><para>
+Définition à la ligne <link linkend="__brushless_eirbot_8cpp_source_1l00396">396</link> du fichier <link linkend="__brushless_eirbot_8cpp_source">BrushlessEirbot.cpp</link>.</para>
+</section>
+</section>
+<section>
+<title>Documentation des données membres</title>
+<anchor xml:id="_class_p_i_1aa37373b99dc589197e28074095bde55b"/><section>
+    <title>_a0</title>
+<indexterm><primary>_a0</primary><secondary>PI</secondary></indexterm>
+<indexterm><primary>PI</primary><secondary>_a0</secondary></indexterm>
+<para><computeroutput>double PI::_a0<computeroutput>[protected]</computeroutput></computeroutput></para><para>
+Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00069">69</link> du fichier <link linkend="__brushless_eirbot_8hpp_source">BrushlessEirbot.hpp</link>.</para>
+</section>
+<anchor xml:id="_class_p_i_1a4049d39350a7192edc3c47d5c0a2d614"/><section>
+    <title>_K</title>
+<indexterm><primary>_K</primary><secondary>PI</secondary></indexterm>
+<indexterm><primary>PI</primary><secondary>_K</secondary></indexterm>
+<para><computeroutput>double PI::_K<computeroutput>[protected]</computeroutput></computeroutput></para><para>
+Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00068">68</link> du fichier <link linkend="__brushless_eirbot_8hpp_source">BrushlessEirbot.hpp</link>.</para>
+</section>
+<para>
+La documentation de cette classe a été générée à partir des fichiers suivants :</para>
+lib/BrushlessEirbot/BrushlessEirbot.hpplib/BrushlessEirbot/BrushlessEirbot.cpp</section>
+</section>

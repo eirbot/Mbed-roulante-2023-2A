@@ -68,7 +68,7 @@ ADD_DEFINITIONS(
   -DDEVICE_STDIO_MESSAGES=1
   -DDEVICE_USTICKER=1
   -DDEVICE_WATCHDOG=1
-  -DMBED_BUILD_TIMESTAMP=1678824126.82
+  -DMBED_BUILD_TIMESTAMP=1679351831.81
   -DSTM32F446xx
   -DTARGET_CORTEX
   -DTARGET_CORTEX_M
@@ -172,19 +172,25 @@ INCLUDE_DIRECTORIES(
   lib/SerialPlot
   lib/Robot
   lib/Odometer
+  lib/Controllers
   lib/BrushlessEirbot
   lib
-  CubeMx
   C:/Users/leova/OneDrive/Eirbot/Coupe 23/eirbot-2023-2A/roulante/Mbed/mbed-os
   .
   )
 
 # executable Mbed
 ADD_EXECUTABLE(Mbed
-        lib/BrushlessEirbot/tim.c
-        lib/BrushlessEirbot/tim.h
   lib/BrushlessEirbot/BrushlessEirbot.cpp
   lib/BrushlessEirbot/BrushlessEirbot.hpp
+  lib/BrushlessEirbot/tim.c
+  lib/BrushlessEirbot/tim.h
+  lib/Controllers/Controller.cpp
+  lib/Controllers/Controller.h
+  lib/Controllers/PIController.cpp
+  lib/Controllers/PIController.h
+  lib/Controllers/PIDController.cpp
+  lib/Controllers/PIDController.h
   lib/Odometer/Odometer.cpp
   lib/Odometer/Odometer.hpp
   lib/Robot/Robot.cpp

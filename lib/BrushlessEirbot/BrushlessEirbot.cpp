@@ -1,23 +1,20 @@
 #include "BrushlessEirbot.hpp"
 
-/*********************************************************************************
- * Contructeur et destructeurs
- *********************************************************************************/
+/* *******************************************************************************
+ *                          Constructeur et destructeurs
+ * *******************************************************************************/
 
-
-BrushlessEirbot::BrushlessEirbot(position position, double wheelDiameterMm) {
-    if (_serial->isatty() < 0){
+BrushlessEirbot::BrushlessEirbot(position position_motor, float wheelDiameterMm) {
+    if (!_debug){
         delete _serial; // pas de debug
     }
-    else{
-        debug = false;
-    }
 
-    _positionMotor = position;
-    _stateController = enable;
+    _positionMotor = position_motor;
+    _stateController = activated;
+    _wheelDiameterMm = wheelDiameterMm;
 
     // Initialisation des structures
-    hall = {.h1=0, .h2=0, .h3=0, .h123=0, .prev_h123=0, .tickS=0, .tickP=0};
+    hall = {.h1=0, .h2=0, .h3=0, .h123=0, .prev_h123=0, .ticks=0};
     PWM = {.aH=1, .aL=0, .bH=1, .bL=0, .cH=0, .cL=0, .sens=clockwise};
     data = {.speed_ref=0, .speed=0, .error=0, .prev_error=0, .cmd=0, .prev_cmd=0, .cmdsat=10, .prev_cmdsat=0};
 
@@ -81,10 +78,9 @@ BrushlessEirbot::BrushlessEirbot(position position, double wheelDiameterMm) {
     Current_C = new AnalogIn(_pinCurrent_C);
 }
 
-BrushlessEirbot::BrushlessEirbot(BufferedSerial *pc, position position_motor, double wheelDiameterMm) {
+BrushlessEirbot::BrushlessEirbot(BufferedSerial *pc, position position_motor, float wheelDiameterMm): BrushlessEirbot(position_motor, wheelDiameterMm) {
+    _debug = true;
     _serial = pc;
-    debug = 1;
-    BrushlessEirbot(position_motor, wheelDiameterMm);
 }
 
 BrushlessEirbot::~BrushlessEirbot() {
@@ -97,11 +93,181 @@ BrushlessEirbot::~BrushlessEirbot() {
     delete Current_B;
     delete Current_C;
     delete _serial;
+    delete controller;
 }
 
-/*********************************************************************************
- * Méthodes primitives
- *********************************************************************************/
+/* *******************************************************************************
+ *                              Méthodes publiques
+ * *******************************************************************************/
+
+void BrushlessEirbot::setVelocity(unitVelocity unit, float consigne) {
+    _stateController = activated;
+    switch (unit) {
+        case rad_s:
+            break;
+        case tick_s:
+            break;
+        case mm_s:
+            break;
+    }
+}
+
+void BrushlessEirbot::setController(state stateController){
+
+}
+
+
+double BrushlessEirbot::getVelocity(unitVelocity unit) const {
+    switch (unit) {
+        case rad_s:
+            return hall.ticks*(2*M_PI)/ticksPerRevolution; // convert to rad/s
+            break;
+        case tick_s:
+            // convert to tick/s
+            break;
+        case mm_s:
+            // convert to mm/s
+            break;
+        default:
+            return (MAXFLOAT);
+    }
+}
+
+void BrushlessEirbot::setPI(float Kp, float wi, std::chrono::microseconds TeUsController) {
+    TeUsController = TeUsController;
+    double Te = (double) (TeUsController.count() / 1e-6);
+    controller = new PIController(Kp, wi, Te);
+}
+
+void BrushlessEirbot::setPID(float Kp, float wi, float wb, float wh, std::chrono::microseconds TeUsController) {
+    TeUsController = TeUsController;
+    double Te = (double) (TeUsController.count() / 1e-6);
+    controller = new PIDController(Kp, wi, wb, wh, Te);
+}
+
+void BrushlessEirbot::displayPinOut() {
+    if (_debug){
+        std::string buffer("PMW on half-bridges :\n");
+        buffer.append(to_string(_pinPWM_AH) + "\t");
+        buffer.append(to_string(_pinPWM_AL) + "\n");
+        buffer.append(to_string(_pinPWM_BH) + "\t");
+        buffer.append(to_string(_pinPWM_BL) + "\n");
+        buffer.append(to_string(_pinPWM_CH) + "\t");
+        buffer.append(to_string(_pinPWM_CL) + "\n");
+        buffer.append("Hall sensors :\n");
+        buffer.append(to_string(_pinHall_1) + "\n");
+        buffer.append(to_string(_pinHall_2) + "\n");
+        buffer.append(to_string(_pinHall_3) + "\n");
+        buffer.append("Currents sensors :\n");
+        buffer.append(to_string(_pinCurrent_A) + "\n");
+        buffer.append(to_string(_pinCurrent_B) + "\n");
+        buffer.append(to_string(_pinCurrent_C) + "\n");
+
+        _serial->write(buffer.c_str(), buffer.length());
+    }
+}
+
+/* *******************************************************************************
+ *                              Méthodes primitives
+ * *******************************************************************************/
+
+void BrushlessEirbot::decodeHall() {
+
+    hall.h123= (hall.h1<<2) | (hall.h2<<1) | hall.h3;     // for motor sense reading
+    if (PWM.sens == clockwise) {                                   // clockwise
+        PWM.aH = (hall.h1)  && (!hall.h2);
+        PWM.aL = (!hall.h1) && (hall.h2);
+        PWM.bH = (hall.h2)  && (!hall.h3);
+        PWM.bL = (!hall.h2) && (hall.h3);
+        PWM.cH = (!hall.h1) && (hall.h3);
+        PWM.cL = (hall.h1)  && (!hall.h3);
+    } else if (PWM.sens == antiClockwise) {                        // anti-clockwise
+        PWM.aH = (!hall.h1) && (hall.h2);
+        PWM.aL = (hall.h1)  && (!hall.h2);
+        PWM.bH = (!hall.h2) && (hall.h3);
+        PWM.bL = (hall.h2)  && (!hall.h3);
+        PWM.cH = (hall.h1)  && (!hall.h3);
+        PWM.cL = (!hall.h1) && (hall.h3);
+    }
+
+    // Count ticks
+    if (hall.h123 != hall.prev_h123) {                            //for sense sign reading
+        // 101 -> 100 -> 110 -> 010 -> 011 -> 001 clockwise
+        switch (hall.h123)
+        {
+            case 0b001:
+                if (hall.prev_h123 == 0b011) (hall.ticks)++;      // clockwise
+                else (hall.ticks)--;
+                break;                                            // anti clockwise
+            case 0b010:
+                if (hall.prev_h123 == 0b110) (hall.ticks)++;
+                else (hall.ticks)--;
+                break;
+            case 0b011:
+                if (hall.prev_h123 == 0b010) (hall.ticks)++;
+                else (hall.ticks)--;
+                break;
+            case 0b100:
+                if (hall.prev_h123 == 0b101) (hall.ticks)++;
+                else (hall.ticks)--;
+                break;
+            case 0b101:
+                if (hall.prev_h123 == 0b001) (hall.ticks)++;
+                else (hall.ticks)--;
+                break;
+            case 0b110:
+                if (hall.prev_h123 == 0b100) (hall.ticks)++;
+                else (hall.ticks)--;
+                break;
+            default:
+                break;
+        }
+    }
+
+    hall.prev_h123 = hall.h123;
+}
+
+void BrushlessEirbot::updateOutput() {
+    if (PWM.aH) {                       //CC1E=1
+        timerPWM->CCER |= TIM_CCER_CC1E;
+    } else {                            //CC1E=0
+        timerPWM->CCER &= ~(TIM_CCER_CC1E);
+    }
+
+    if (PWM.aL) {                       //CC1NE=1
+        timerPWM->CCER |= TIM_CCER_CC1NE;
+    } else {                            //CC1NE=0
+        timerPWM->CCER &= ~(TIM_CCER_CC1NE);
+    }
+
+    if (PWM.bH) {
+        timerPWM->CCER |= TIM_CCER_CC2E;
+    } else {
+        timerPWM->CCER &= ~(TIM_CCER_CC2E);
+    }
+
+    if (PWM.bL) {
+        timerPWM->CCER |= TIM_CCER_CC2NE;
+    } else {
+        timerPWM->CCER &= ~(TIM_CCER_CC2NE);
+    }
+
+    if (PWM.cH) {
+        timerPWM->CCER |= TIM_CCER_CC3E;
+    } else {
+        timerPWM->CCER &= ~(TIM_CCER_CC3E);
+    }
+
+    if (PWM.cL) {
+        timerPWM->CCER |= TIM_CCER_CC3NE;
+    } else {
+        timerPWM->CCER &= ~(TIM_CCER_CC3NE);
+    }
+}
+
+/* *******************************************************************************
+ *                              Méthodes asservissements
+ * *******************************************************************************/
 
 void BrushlessEirbot::setDutyCycle() {
     /*
@@ -128,102 +294,6 @@ void BrushlessEirbot::setDutyCycle() {
     }
 }
 
-void BrushlessEirbot::decodeHall() {
-    /*
-     * Décode les interruptions sur les capteurs à effet Hall pour prévoir la prochaine séquence de commutation des demi-pont.
-     */
-    hall.h123= (hall.h1<<2) | (hall.h2<<1) | hall.h3;     // for motor sense reading
-    if (PWM.sens == clockwise) {                                   // clockwise
-        PWM.aH = (hall.h1)  && (!hall.h2);
-        PWM.aL = (!hall.h1) && (hall.h2);
-        PWM.bH = (hall.h2)  && (!hall.h3);
-        PWM.bL = (!hall.h2) && (hall.h3);
-        PWM.cH = (!hall.h1) && (hall.h3);
-        PWM.cL = (hall.h1)  && (!hall.h3);
-    } else if (PWM.sens == antiClockwise) {                        // anti-clockwise
-        PWM.aH = (!hall.h1) && (hall.h2);
-        PWM.aL = (hall.h1)  && (!hall.h2);
-        PWM.bH = (!hall.h2) && (hall.h3);
-        PWM.bL = (hall.h2)  && (!hall.h3);
-        PWM.cH = (hall.h1)  && (!hall.h3);
-        PWM.cL = (!hall.h1) && (hall.h3);
-    }
-
-    // Count ticks
-    if (hall.h123 != hall.prev_h123) {                            //for sense sign reading
-        // 101 -> 100 -> 110 -> 010 -> 011 -> 001 clockwise
-        switch (hall.h123)
-        {
-            case 0b001:
-                if (hall.prev_h123 == 0b011) (hall.tickS)++;      // clockwise
-                else (hall.tickS)--;
-                break;                                            // anti clockwise
-            case 0b010:
-                if (hall.prev_h123 == 0b110) (hall.tickS)++;
-                else (hall.tickS)--;
-                break;
-            case 0b011:
-                if (hall.prev_h123 == 0b010) (hall.tickS)++;
-                else (hall.tickS)--;
-                break;
-            case 0b100:
-                if (hall.prev_h123 == 0b101) (hall.tickS)++;
-                else (hall.tickS)--;
-                break;
-            case 0b101:
-                if (hall.prev_h123 == 0b001) (hall.tickS)++;
-                else (hall.tickS)--;
-                break;
-            case 0b110:
-                if (hall.prev_h123 == 0b100) (hall.tickS)++;
-                else (hall.tickS)--;
-                break;
-            default:
-                break;
-        }
-    }
-
-    hall.prev_h123 = hall.h123;
-}
-
-void BrushlessEirbot::updateOutput() {
-        if (PWM.aH) {                       //CC1E=1
-            timerPWM->CCER |= TIM_CCER_CC1E;
-        } else {                            //CC1E=0
-            timerPWM->CCER &= ~(TIM_CCER_CC1E);
-        }
-
-        if (PWM.aL) {                       //CC1NE=1
-            timerPWM->CCER |= TIM_CCER_CC1NE;
-        } else {                            //CC1NE=0
-            timerPWM->CCER &= ~(TIM_CCER_CC1NE);
-        }
-
-        if (PWM.bH) {
-            timerPWM->CCER |= TIM_CCER_CC2E;
-        } else {
-            timerPWM->CCER &= ~(TIM_CCER_CC2E);
-        }
-
-        if (PWM.bL) {
-            timerPWM->CCER |= TIM_CCER_CC2NE;
-        } else {
-            timerPWM->CCER &= ~(TIM_CCER_CC2NE);
-        }
-
-        if (PWM.cH) {
-            timerPWM->CCER |= TIM_CCER_CC3E;
-        } else {
-            timerPWM->CCER &= ~(TIM_CCER_CC3E);
-        }
-
-        if (PWM.cL) {
-            timerPWM->CCER |= TIM_CCER_CC3NE;
-        } else {
-            timerPWM->CCER &= ~(TIM_CCER_CC3NE);
-        }
-}
-
 int16_t BrushlessEirbot::calculateSpeed() {
     /*
      * Calculate motor speed using hall effect sensor
@@ -231,111 +301,50 @@ int16_t BrushlessEirbot::calculateSpeed() {
      * return measurement_L.speed in tick/s
      * resolution : 1/p mechanical turn  -> 48ticks for 1turn
      */
-    if (hall.tickS > 240)
+    if (hall.ticks > 240)
         return (int16_t) MAX_SPEED;
-    else if (hall.tickS < -240)
+    else if (hall.ticks < -240)
         return (int16_t) MIN_SPEED;
     else
-        return 100 * hall.tickS;
+        return 100 * hall.ticks;
 }
 
-void BrushlessEirbot::writeCommand() {
-    /*
-     * Ecrit la séquence de commutation donnée par les effets Hall.
-     */
-    if ((data.cmdsat >= 0) && (data.cmdsat <= DC_MAX)) {  //clockwise
-        PWM.sens = clockwise;
-        timerPWM->CCR1 = data.cmdsat;
-        timerPWM->CCR2 = data.cmdsat;
-        timerPWM->CCR3 = data.cmdsat;
-    } else if ((data.cmdsat >= DC_MIN) && (data.cmdsat < 0)) {  //anti clockwise
-        PWM.sens = antiClockwise;
-        timerPWM->CCR1 = -data.cmdsat;
-        timerPWM->CCR2 = -data.cmdsat;
-        timerPWM->CCR3 = -data.cmdsat;
-    } else {  //error state --> PWM off
-        PWM.sens = clockwise;
-        timerPWM->CCR1 = 0;
-        timerPWM->CCR2 = 0;
-        timerPWM->CCR3 = 0;
+/* *******************************************************************************
+ *                     Cadencement des méthodes primaires et asservissment
+ * *******************************************************************************/
+void BrushlessEirbot::hallInterrupt() {
+    // Lecture Hall sensors
+    hall.h1 = HALL_1->read();
+    hall.h2 = HALL_2->read();
+    hall.h3 = HALL_3->read();
+
+    // Affectation de la séquence d'après
+    hall.h123= (hall.h1<<2) | (hall.h2<<1) | hall.h3; // for motor sense reading
+    if (PWM.sens == clockwise) {
+        PWM.aH = (hall.h1)  && (!hall.h2);
+        PWM.aL = (!hall.h1) && (hall.h2);
+        PWM.bH = (hall.h2)  && (!hall.h3);
+        PWM.bL = (!hall.h2) && (hall.h3);
+        PWM.cH = (!hall.h1) && (hall.h3);
+        PWM.cL = (hall.h1)  && (!hall.h3);
+    } else if (PWM.sens == antiClockwise) {
+        PWM.aH = (!hall.h1) && (hall.h2);
+        PWM.aL = (hall.h1)  && (!hall.h2);
+        PWM.bH = (!hall.h2) && (hall.h3);
+        PWM.bL = (hall.h2)  && (!hall.h3);
+        PWM.cH = (hall.h1)  && (!hall.h3);
+        PWM.cL = (!hall.h1) && (hall.h3);
     }
 }
 
-/*********************************************************************************
- * Cadencement des méthodes primaires
- *********************************************************************************/
-void BrushlessEirbot::hallInterrupt() {
-
-}
 void BrushlessEirbot::_routineHallSecure() {
-    /*
-     * Vérifie si une interruption n'a pas été ratée, pour éviter le court circuit sur une phase du moteur
-     */
     // TODO Verifier la bonne cohérence
 }
 
 void BrushlessEirbot::_routineController(){
-    /*
-     * Calcul la vitesse et gère l'asservissement de la vitesse du moteur
-     */
 
+    // TODO Asservissement routine
 }
-
-/*********************************************************************************
- * Méthodes publiques
- *********************************************************************************/
-
-void BrushlessEirbot::setVelocity(unitVelocity unit, double consigne) {
-    /*
-     * Retourne la vitesse du moteur dans l'unité renseignée
-     */
-    switch (unit) {
-        case rad_s:
-            break;
-        case tick_s:
-            break;
-        case mm_s:
-            break;
-    }
-}
-
-double BrushlessEirbot::getVelocity(unitVelocity unit) const {
-    switch (unit) {
-        case rad_s:
-            // convert to rad/s
-            break;
-        case tick_s:
-            // convert to tick/s
-            break;
-        case mm_s:
-            // convert to mm/s
-            break;
-        default:
-            return (MAXFLOAT);
-    }
-    return 0;
-}
-
-void BrushlessEirbot::displayPinOut() {
-    std::string buffer("PMW on half-bridges :\n");
-    buffer.append(to_string(_pinPWM_AH) + "\t");
-    buffer.append(to_string(_pinPWM_AL) + "\n");
-    buffer.append(to_string(_pinPWM_BH) + "\t");
-    buffer.append(to_string(_pinPWM_BL) + "\n");
-    buffer.append(to_string(_pinPWM_CH) + "\t");
-    buffer.append(to_string(_pinPWM_CL) + "\n");
-    buffer.append("Hall sensors :\n");
-    buffer.append(to_string(_pinHall_1) + "\n");
-    buffer.append(to_string(_pinHall_2) + "\n");
-    buffer.append(to_string(_pinHall_3) + "\n");
-    buffer.append("Currents sensors :\n");
-    buffer.append(to_string(_pinCurrent_A) + "\n");
-    buffer.append(to_string(_pinCurrent_B) + "\n");
-    buffer.append(to_string(_pinCurrent_C) + "\n");
-
-    _serial->write(buffer.c_str(), buffer.length());
-}
-
 
 
 

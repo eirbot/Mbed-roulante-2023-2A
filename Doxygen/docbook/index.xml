@@ -9,7 +9,8 @@
     <xi:include href="structdata_speed__t.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
     <xi:include href="structhall__t.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
     <xi:include href="class_odometer.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
-    <xi:include href="struct_p_i_d__t.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="class_p_i_controller.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="class_p_i_d_controller.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
     <xi:include href="struct_p_w_m__t.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
     <xi:include href="class_robot.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
     <xi:include href="class_serial_plot.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
@@ -18,6 +19,10 @@
     <title>Documentation des fichiers</title>
     <xi:include href="_brushless_eirbot_8cpp_source.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
     <xi:include href="_brushless_eirbot_8hpp_source.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="_p_i_controller_8cpp_source.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="_p_i_controller_8h_source.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="_p_i_d_controller_8cpp_source.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="_p_i_d_controller_8h_source.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
     <xi:include href="tim_8c_source.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
     <xi:include href="tim_8h_source.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
     <xi:include href="_odometer_8cpp_source.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>

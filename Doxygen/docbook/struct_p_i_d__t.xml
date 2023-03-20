@@ -20,7 +20,7 @@
 <section>
 <title>Description détaillée</title>
 <para>
-Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00062">62</link> du fichier <link linkend="__brushless_eirbot_8hpp_source">BrushlessEirbot.hpp</link>.</para>
+Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00091">91</link> du fichier <link linkend="__brushless_eirbot_8hpp_source">BrushlessEirbot.hpp</link>.</para>
 </section>
 <section>
 <title>Documentation des données membres</title>
@@ -29,35 +29,35 @@ Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00062">6
 <indexterm><primary>a0</primary><secondary>PID_t</secondary></indexterm>
 <indexterm><primary>PID_t</primary><secondary>a0</secondary></indexterm>
 <para><computeroutput>const float PID_t::a0</computeroutput></para><para>
-Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00067">67</link> du fichier <link linkend="__brushless_eirbot_8hpp_source">BrushlessEirbot.hpp</link>.</para>
+Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00096">96</link> du fichier <link linkend="__brushless_eirbot_8hpp_source">BrushlessEirbot.hpp</link>.</para>
 </section>
 <anchor xml:id="_struct_p_i_d__t_1a5d775efdb7802dbcb8013580cae33b00"/><section>
     <title>a1</title>
 <indexterm><primary>a1</primary><secondary>PID_t</secondary></indexterm>
 <indexterm><primary>PID_t</primary><secondary>a1</secondary></indexterm>
 <para><computeroutput>const float PID_t::a1</computeroutput></para><para>
-Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00068">68</link> du fichier <link linkend="__brushless_eirbot_8hpp_source">BrushlessEirbot.hpp</link>.</para>
+Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00097">97</link> du fichier <link linkend="__brushless_eirbot_8hpp_source">BrushlessEirbot.hpp</link>.</para>
 </section>
 <anchor xml:id="_struct_p_i_d__t_1a38af795ea69abb4eaa108001a29e54a3"/><section>
     <title>Kp</title>
 <indexterm><primary>Kp</primary><secondary>PID_t</secondary></indexterm>
 <indexterm><primary>PID_t</primary><secondary>Kp</secondary></indexterm>
 <para><computeroutput>const float PID_t::Kp</computeroutput></para><para>
-Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00063">63</link> du fichier <link linkend="__brushless_eirbot_8hpp_source">BrushlessEirbot.hpp</link>.</para>
+Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00092">92</link> du fichier <link linkend="__brushless_eirbot_8hpp_source">BrushlessEirbot.hpp</link>.</para>
 </section>
 <anchor xml:id="_struct_p_i_d__t_1a69b0f5372f3678cfb028a6540fbf2b89"/><section>
     <title>Te</title>
 <indexterm><primary>Te</primary><secondary>PID_t</secondary></indexterm>
 <indexterm><primary>PID_t</primary><secondary>Te</secondary></indexterm>
 <para><computeroutput>const float PID_t::Te</computeroutput></para><para>
-Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00065">65</link> du fichier <link linkend="__brushless_eirbot_8hpp_source">BrushlessEirbot.hpp</link>.</para>
+Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00094">94</link> du fichier <link linkend="__brushless_eirbot_8hpp_source">BrushlessEirbot.hpp</link>.</para>
 </section>
 <anchor xml:id="_struct_p_i_d__t_1abbf3bea884af0dd750d210947d586128"/><section>
     <title>w_i</title>
 <indexterm><primary>w_i</primary><secondary>PID_t</secondary></indexterm>
 <indexterm><primary>PID_t</primary><secondary>w_i</secondary></indexterm>
 <para><computeroutput>const float PID_t::w_i</computeroutput></para><para>
-Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00064">64</link> du fichier <link linkend="__brushless_eirbot_8hpp_source">BrushlessEirbot.hpp</link>.</para>
+Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00093">93</link> du fichier <link linkend="__brushless_eirbot_8hpp_source">BrushlessEirbot.hpp</link>.</para>
 </section>
 <para>
 La documentation de cette structure a été générée à partir du fichier suivant :</para>

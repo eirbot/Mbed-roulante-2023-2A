@@ -6,12 +6,16 @@
     <title>Fonctions membres publiques    </title>
         <itemizedlist>
             <listitem><para><link linkend="_class_brushless_eirbot_1a0587c7994656972670b76ce176489a06">BrushlessEirbot</link> (position position_motor, double wheelDiameterMm)</para>
-
-<para>Si la position est define sur <emphasis>Left</emphasis> le timer utilisé est le timer 1. Si la position est define sur <emphasis>Right</emphasis> le timer utilisé est le timer 8. </para>
 </listitem>
             <listitem><para><link linkend="_class_brushless_eirbot_1a8fc9dcffc3622ea55ec65d855bf428fc">BrushlessEirbot</link> (BufferedSerial *pc, position position_motor, double wheelDiameterMm)</para>
 </listitem>
+            <listitem><para>void <link linkend="_class_brushless_eirbot_1a5241f404cf29badcb111e9f7fb0af3a8">setPI</link> (double Kp, double wi, std::chrono::microseconds TeUsController=10ms)</para>
+</listitem>
+            <listitem><para>void <link linkend="_class_brushless_eirbot_1ae1c2c242b70dfe7f1e63d5b714c3ea53">setPID</link> (double Kp, double wi, double wb, double wh, std::chrono::microseconds TeUsController=10ms)</para>
+</listitem>
             <listitem><para>void <link linkend="_class_brushless_eirbot_1a6448f3e20f871690231f6da3a547169e">setVelocity</link> (unitVelocity unit, double consigne)</para>
+</listitem>
+            <listitem><para>void <link linkend="_class_brushless_eirbot_1a5ea31800aa8df165909d665fe6f4ab6b">setController</link> (state stateController)</para>
 </listitem>
             <listitem><para>double <link linkend="_class_brushless_eirbot_1aeb947ad1aa4fbab728f26b75b1c93525">getVelocity</link> (unitVelocity unit) const</para>
 </listitem>
@@ -22,7 +26,7 @@
 <section>
 <title>Description détaillée</title>
 <para>
-Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00072">72</link> du fichier <link linkend="__brushless_eirbot_8hpp_source">BrushlessEirbot.hpp</link>.</para>
+Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00063">63</link> du fichier <link linkend="__brushless_eirbot_8hpp_source">BrushlessEirbot.hpp</link>.</para>
 </section>
 <section>
 <title>Documentation des constructeurs et destructeur</title>
@@ -30,12 +34,8 @@ Définition à la ligne <link linkend="__brushless_eirbot_8hpp_source_1l00072">7
     <title>BrushlessEirbot()<computeroutput>[1/2]</computeroutput></title>
 <indexterm><primary>BrushlessEirbot</primary><secondary>BrushlessEirbot</secondary></indexterm>
 <indexterm><primary>BrushlessEirbot</primary><secondary>BrushlessEirbot</secondary></indexterm>
-<para><computeroutput>BrushlessEirbot::BrushlessEirbot (position position_motor, double wheelDiameterMm)</computeroutput></para><para>
-
-<para>Si la position est define sur <emphasis>Left</emphasis> le timer utilisé est le timer 1. Si la position est define sur <emphasis>Right</emphasis> le timer utilisé est le timer 8. </para>
-</para>
-
-<para>Constructeur de l&apos;object <link linkend="_class_brushless_eirbot">BrushlessEirbot</link> avec l&apos;information de la position du moteur. La position détermine le timer spécial utilisé. Ils sont au nombre de 2 (timer1 et timer8)</para>
+<para><computeroutput>BrushlessEirbot::BrushlessEirbot (position position_motor, double wheelDiameterMm)</computeroutput></para>
+<para>Constructeur de l&apos;object <link linkend="_class_brushless_eirbot">BrushlessEirbot</link> avec l&apos;information de la position du moteur. La position détermine le timer spécial utilisé. Ils sont au nombre de 2 (timer1 et timer8) Si la position est define sur <emphasis>Left</emphasis> le timer utilisé est le timer 1. Si la position est define sur <emphasis>Right</emphasis> le timer utilisé est le timer 8.</para>
 
 <para>
                 <formalpara>
@@ -64,7 +64,7 @@ Paramètres</title>
                 </formalpara>
                 </para>
 <para>
-Définition à la ligne <link linkend="__brushless_eirbot_8cpp_source_1l00008">8</link> du fichier <link linkend="__brushless_eirbot_8cpp_source">BrushlessEirbot.cpp</link>.</para>
+Définition à la ligne <link linkend="__brushless_eirbot_8cpp_source_1l00007">7</link> du fichier <link linkend="__brushless_eirbot_8cpp_source">BrushlessEirbot.cpp</link>.</para>
 </section>
 <anchor xml:id="_class_brushless_eirbot_1a8fc9dcffc3622ea55ec65d855bf428fc"/><section>
     <title>BrushlessEirbot()<computeroutput>[2/2]</computeroutput></title>
@@ -119,22 +119,196 @@ Définition à la ligne <link linkend="__brushless_eirbot_8cpp_source_1l00086">8
     <title>displayPinOut()</title>
 <indexterm><primary>displayPinOut</primary><secondary>BrushlessEirbot</secondary></indexterm>
 <indexterm><primary>BrushlessEirbot</primary><secondary>displayPinOut</secondary></indexterm>
-<para><computeroutput>void BrushlessEirbot::displayPinOut ( )</computeroutput></para><para>
-Définition à la ligne <link linkend="__brushless_eirbot_8cpp_source_1l00316">316</link> du fichier <link linkend="__brushless_eirbot_8cpp_source">BrushlessEirbot.cpp</link>.</para>
+<para><computeroutput>void BrushlessEirbot::displayPinOut ( )</computeroutput></para>
+<para>Affiche sur le port de debug le pinOut Faisable seulement si le port de debug à été configuré </para>
+<para>
+Définition à la ligne <link linkend="__brushless_eirbot_8cpp_source_1l00149">149</link> du fichier <link linkend="__brushless_eirbot_8cpp_source">BrushlessEirbot.cpp</link>.</para>
 </section>
 <anchor xml:id="_class_brushless_eirbot_1aeb947ad1aa4fbab728f26b75b1c93525"/><section>
     <title>getVelocity()</title>
 <indexterm><primary>getVelocity</primary><secondary>BrushlessEirbot</secondary></indexterm>
 <indexterm><primary>BrushlessEirbot</primary><secondary>getVelocity</secondary></indexterm>
-<para><computeroutput>double BrushlessEirbot::getVelocity (unitVelocity unit) const</computeroutput></para><para>
-Définition à la ligne <link linkend="__brushless_eirbot_8cpp_source_1l00299">299</link> du fichier <link linkend="__brushless_eirbot_8cpp_source">BrushlessEirbot.cpp</link>.</para>
+<para><computeroutput>double BrushlessEirbot::getVelocity (unitVelocity unit) const</computeroutput></para>
+<para>Revoie la valeur de la vitesse actuelle du robot. Cette vitesse est relevée toutes les 10 ms. (pour l&apos;assevissement) 
+                <formalpara>
+                    <title>
+Paramètres</title>
+                    <para>
+                    <table frame="all">
+                        <tgroup cols="2" align="left" colsep="1" rowsep="1">
+                        <colspec colwidth="1*"/>
+                        <colspec colwidth="4*"/>
+                        <tbody>
+                            <row>
+<entry>unit</entry><entry>
+<para>: Soit en rad_s (radian par seconde), tick_s (ticks par seconde), mm_s (millimètre par seconde) </para>
+</entry>
+                            </row>
+                        </tbody>
+                        </tgroup>
+                    </table>
+                    </para>
+                </formalpara>
+                <formalpara><title>Renvoie</title>
+
+<para>double velocity </para>
+</formalpara>
+</para>
+<para>
+Définition à la ligne <link linkend="__brushless_eirbot_8cpp_source_1l00121">121</link> du fichier <link linkend="__brushless_eirbot_8cpp_source">BrushlessEirbot.cpp</link>.</para>
+</section>
+<anchor xml:id="_class_brushless_eirbot_1a5ea31800aa8df165909d665fe6f4ab6b"/><section>
+    <title>setController()</title>
+<indexterm><primary>setController</primary><secondary>BrushlessEirbot</secondary></indexterm>
+<indexterm><primary>BrushlessEirbot</primary><secondary>setController</secondary></indexterm>
+<para><computeroutput>void BrushlessEirbot::setController (state stateController)</computeroutput></para>
+<para>Décide de l&apos;état de l&apos;asservissement 
+                <formalpara>
+                    <title>
+Paramètres</title>
+                    <para>
+                    <table frame="all">
+                        <tgroup cols="2" align="left" colsep="1" rowsep="1">
+                        <colspec colwidth="1*"/>
+                        <colspec colwidth="4*"/>
+                        <tbody>
+                            <row>
+<entry>stateController</entry><entry>
+<para>: </para>
+</entry>
+                            </row>
+                        </tbody>
+                        </tgroup>
+                    </table>
+                    </para>
+                </formalpara>
+                </para>
+<para>
+Définition à la ligne <link linkend="__brushless_eirbot_8cpp_source_1l00116">116</link> du fichier <link linkend="__brushless_eirbot_8cpp_source">BrushlessEirbot.cpp</link>.</para>
+</section>
+<anchor xml:id="_class_brushless_eirbot_1a5241f404cf29badcb111e9f7fb0af3a8"/><section>
+    <title>setPI()</title>
+<indexterm><primary>setPI</primary><secondary>BrushlessEirbot</secondary></indexterm>
+<indexterm><primary>BrushlessEirbot</primary><secondary>setPI</secondary></indexterm>
+<para><computeroutput>void BrushlessEirbot::setPI (double Kp, double wi, std::chrono::microseconds TeUsController = <computeroutput>10ms</computeroutput>
+)</computeroutput></para>
+<para>Implémentation d&apos;un correcteur PI 
+                <formalpara>
+                    <title>
+Paramètres</title>
+                    <para>
+                    <table frame="all">
+                        <tgroup cols="2" align="left" colsep="1" rowsep="1">
+                        <colspec colwidth="1*"/>
+                        <colspec colwidth="4*"/>
+                        <tbody>
+                            <row>
+<entry>Kp</entry><entry>
+<para></para>
+</entry>
+                            </row>
+                            <row>
+<entry>wi</entry><entry>
+<para></para>
+</entry>
+                            </row>
+                            <row>
+<entry>TeUsController</entry><entry>
+<para></para>
+</entry>
+                            </row>
+                        </tbody>
+                        </tgroup>
+                    </table>
+                    </para>
+                </formalpara>
+                </para>
+<para>
+Définition à la ligne <link linkend="__brushless_eirbot_8cpp_source_1l00137">137</link> du fichier <link linkend="__brushless_eirbot_8cpp_source">BrushlessEirbot.cpp</link>.</para>
+</section>
+<anchor xml:id="_class_brushless_eirbot_1ae1c2c242b70dfe7f1e63d5b714c3ea53"/><section>
+    <title>setPID()</title>
+<indexterm><primary>setPID</primary><secondary>BrushlessEirbot</secondary></indexterm>
+<indexterm><primary>BrushlessEirbot</primary><secondary>setPID</secondary></indexterm>
+<para><computeroutput>void BrushlessEirbot::setPID (double Kp, double wi, double wb, double wh, std::chrono::microseconds TeUsController = <computeroutput>10ms</computeroutput>
+)</computeroutput></para>
+<para>Implémentation d&apos;un correcteur PID 
+                <formalpara>
+                    <title>
+Paramètres</title>
+                    <para>
+                    <table frame="all">
+                        <tgroup cols="2" align="left" colsep="1" rowsep="1">
+                        <colspec colwidth="1*"/>
+                        <colspec colwidth="4*"/>
+                        <tbody>
+                            <row>
+<entry>Kp</entry><entry>
+<para></para>
+</entry>
+                            </row>
+                            <row>
+<entry>wi</entry><entry>
+<para></para>
+</entry>
+                            </row>
+                            <row>
+<entry>wb</entry><entry>
+<para></para>
+</entry>
+                            </row>
+                            <row>
+<entry>wh</entry><entry>
+<para></para>
+</entry>
+                            </row>
+                            <row>
+<entry>TeUsController</entry><entry>
+<para></para>
+</entry>
+                            </row>
+                        </tbody>
+                        </tgroup>
+                    </table>
+                    </para>
+                </formalpara>
+                </para>
+<para>
+Définition à la ligne <link linkend="__brushless_eirbot_8cpp_source_1l00143">143</link> du fichier <link linkend="__brushless_eirbot_8cpp_source">BrushlessEirbot.cpp</link>.</para>
 </section>
 <anchor xml:id="_class_brushless_eirbot_1a6448f3e20f871690231f6da3a547169e"/><section>
     <title>setVelocity()</title>
 <indexterm><primary>setVelocity</primary><secondary>BrushlessEirbot</secondary></indexterm>
 <indexterm><primary>BrushlessEirbot</primary><secondary>setVelocity</secondary></indexterm>
-<para><computeroutput>void BrushlessEirbot::setVelocity (unitVelocity unit, double consigne)</computeroutput></para><para>
-Définition à la ligne <link linkend="__brushless_eirbot_8cpp_source_1l00285">285</link> du fichier <link linkend="__brushless_eirbot_8cpp_source">BrushlessEirbot.cpp</link>.</para>
+<para><computeroutput>void BrushlessEirbot::setVelocity (unitVelocity unit, double consigne)</computeroutput></para>
+<para>Consigne en vitesse 
+                <formalpara>
+                    <title>
+Paramètres</title>
+                    <para>
+                    <table frame="all">
+                        <tgroup cols="2" align="left" colsep="1" rowsep="1">
+                        <colspec colwidth="1*"/>
+                        <colspec colwidth="4*"/>
+                        <tbody>
+                            <row>
+<entry>unit</entry><entry>
+<para></para>
+</entry>
+                            </row>
+                            <row>
+<entry>consigne</entry><entry>
+<para></para>
+</entry>
+                            </row>
+                        </tbody>
+                        </tgroup>
+                    </table>
+                    </para>
+                </formalpara>
+                </para>
+<para>
+Définition à la ligne <link linkend="__brushless_eirbot_8cpp_source_1l00104">104</link> du fichier <link linkend="__brushless_eirbot_8cpp_source">BrushlessEirbot.cpp</link>.</para>
 </section>
 <para>
 La documentation de cette classe a été générée à partir des fichiers suivants :</para>

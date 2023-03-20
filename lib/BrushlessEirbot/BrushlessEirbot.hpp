@@ -1,21 +1,89 @@
 #ifndef brushless_hpp
 #define brushless_hpp
 
+#include <cmath>
 #include "mbed.h"
 #include "tim.h"
+#include "Controllers/Controller.h"
+#include "Controllers/PIController.h"
+#include "Controllers/PIDController.h"
 
-#define P           8                 //p number of poles pairs
-#define FREQ_TIM7   10000
-#define MAX_SPEED   20000
-#define MIN_SPEED   (-20000)
-#define DC_MIN -90
-#define DC_MAX 90
+#define MAX_SPEED            20000
+#define MIN_SPEED            (-20000)
+#define DC_MIN               (-90)
+#define DC_MAX               90
+#define ticksPerRevolution   (14*48)
+
+typedef struct {
+    bool aH;
+    bool aL;
+    bool bH;
+    bool bL;
+    bool cH;
+    bool cL;
+//    rotationSens_t sens;
+} PWM_t;
+
+/**  The following Table  describes the TIM1 Channels states (counterclockwise):
+  -----------------------------------------------------------
+  |Hall 1/2/3|  101  |  100  |  110  |  010  |  011  |  001  |
+   ----------------------------------------------------------
+  | aH-Ch1   |   0   |   0   |   0   |   1   |   1   |   0   |
+   --------  --------------------------------------------------
+  | aL-Ch1N  |   1   |   1   |   0   |   0   |   0   |   0   |
+   --------  --------------------------------------------------
+  | bH-Ch2   |   1   |   0   |   0   |   0   |   0   |   1   |
+   --------  --------------------------------------------------
+  | bL-Ch2N  |   0   |   0   |   1   |   1   |   0   |   0   |
+   --------  --------------------------------------------------
+  | cH-Ch3   |   0   |   1   |   1   |   0   |   0   |   0   |
+   --------  --------------------------------------------------
+  | cL-Ch3N  |   0   |   0   |   0   |   0   |   1   |   1   |
+   ----------------------------------------------------------
+
+   001 -> 011 -> 010 -> 110 -> 100 -> 101
+*/
+const PWM_t clockwiseSequence[6] = {
+        {0,0,1,0,0,1}, // 0b001
+        {1,0,0,1,0,0}, // 0b010
+        {1,0,0,0,0,1}, // 0b011
+        {0,1,0,0,1,0}, // 0b100
+        {0,1,1,0,0,0}, // 0b101
+        {0,0,0,1,1,0}, // 0b110
+};
+/**  The following Table  describes the TIM1 Channels states (clockwise):
+  -----------------------------------------------------------
+  |Hall 1/2/3|  101  |  100  |  110  |  010  |  011  |  001  |
+   ----------------------------------------------------------
+  | aH-Ch1   |   1   |   1   |   0   |   0   |   0   |   0   |
+   --------  --------------------------------------------------
+  | aL-Ch1N  |   0   |   0   |   0   |   1   |   1   |   0   |
+   --------  --------------------------------------------------
+  | bH-Ch2   |   0   |   0   |   1   |   1   |   0   |   0   |
+   --------  --------------------------------------------------
+  | bL-Ch2N  |   1   |   0   |   0   |   0   |   0   |   1   |
+   --------  --------------------------------------------------
+  | cH-Ch3   |   0   |   0   |   0   |   0   |   1   |   1   |
+   --------  --------------------------------------------------
+  | cL-Ch3N  |   0   |   1   |   1   |   0   |   0   |   0   |
+   ----------------------------------------------------------
+
+   101 -> 100 -> 110 -> 010 -> 011 -> 001
+*/
+const PWM_t antiClockwiseSequence[6] = {
+        {0,0,0,1,1,0}, // 0b001
+        {0,1,1,0,0,0}, // 0b010
+        {0,1,0,0,1,0}, // 0b011
+        {1,0,0,0,0,1}, // 0b100
+        {1,0,0,1,0,0}, // 0b101
+        {0,0,1,0,0,1}, // 0b110
+};
 
 enum rotationSens_t {
     clockwise, antiClockwise
 };
 enum state {
-    enable, busy
+    activated, desactivated, emergency
 };
 enum position {
     Left, Right
@@ -31,43 +99,8 @@ typedef struct {
     char h123;
     char prev_h123;    //to determine sense of rotation
 
-    int16_t tickS;    //to calculate speed
-    int32_t tickP;    //tocallback(this, &BrushlessEirbot::hallInterrupt) calculate position
-}hall_t;
-
-typedef struct {
-    // Channels enable bits
-    bool aH;
-    bool aL;
-    bool bH;
-    bool bL;
-    bool cH;
-    bool cL;
-    rotationSens_t sens;
-}PWM_t;
-
-typedef struct{
-    int32_t speed_ref;
-    int32_t speed;
-
-    int32_t error;
-    int32_t prev_error;
-
-    int32_t cmd;
-    int32_t prev_cmd;
-    int32_t cmdsat;
-    int32_t prev_cmdsat;
-}dataSpeed_t;
-
-typedef struct {
-    const float Kp;
-    const float w_i;
-    const float Te;
-    // Integration coefficient : PI(z) = setSpeed_ref(z)/error(z) = Kp*(a0-a1*z^{-1})/(1-z^{-1})
-    const float a0;
-    const float a1;
-}PID_t;
-
+    int32_t ticks;    //to calculate ticks
+} hall_t;
 
 class BrushlessEirbot {
 public:
@@ -81,68 +114,133 @@ public:
      * @param position : Left ou Right selon le timer utilisé
      * @param wheelDiameterMm : Diamètre de la roue en millimètre
      */
-    BrushlessEirbot(position position_motor, double wheelDiameterMm);
+    BrushlessEirbot(position position_motor, float wheelDiameterMm);
+
     /**
      * Constructeur permettant de renseigner un port série de débug.
      * @param pc : Port série de debug
      * @param position_motor : Left ou Right selon le timer utilisé
      * @param wheelDiameterMm : Diamètre de la roue en millimètre
      */
-    BrushlessEirbot(BufferedSerial* pc, position position_motor, double wheelDiameterMm);
-    void setVelocity(unitVelocity unit, double consigne);
-    double getVelocity(unitVelocity unit) const;
-    void displayPinOut();
+    BrushlessEirbot(BufferedSerial *pc, position position_motor, float wheelDiameterMm);
+
     ~BrushlessEirbot();
+
+    /**
+     * Implémentation d'un correcteur PI
+     * @param Kp
+     * @param wi
+     * @param TeUsController
+     */
+    void setPI(float Kp, float wi, std::chrono::microseconds TeUsController = 10ms);
+
+    /**
+     * Implémentation d'un correcteur PID
+     * @param Kp
+     * @param wi
+     * @param wb
+     * @param wh
+     * @param TeUsController
+     */
+    void setPID(float Kp, float wi, float wb, float wh, std::chrono::microseconds TeUsController = 10ms);
+
+    /**
+     * Consigne en vitesse
+     * @param unit
+     * @param consigne
+     */
+    void setVelocity(unitVelocity unit, float consigne);
+
+    /**
+     * Décide de l'état de l'asservissement
+     * @param stateController :
+     */
+    void setController(state stateController);
+
+    /**
+     * Revoie la valeur de la vitesse actuelle du robot.
+     * Cette vitesse est relevée toutes les 10 ms. (pour l'assevissement)
+     * @param unit : Soit en rad_s (radian par seconde), tick_s (ticks par seconde), mm_s (millimètre par seconde)
+     * @return double velocity
+     */
+    double getVelocity(unitVelocity unit) const;
+
+    /**
+    * Affiche sur le port de debug le pinOut
+    * Faisable seulement si le port de debug à été configuré
+    */
+    void displayPinOut();
+
 private:
     state _stateController;
     Timer _timerVelocity;
     position _positionMotor;
+    float _wheelDiameterMm;
 
-    BufferedSerial* _serial;
-    bool debug;
+    BufferedSerial *_serial{0};
+    bool _debug{false};
 
-    void setDutyCycle();
-    void decodeHall();
-    void updateOutput();
-    int16_t calculateSpeed();
-    void writeCommand();
-
-    hall_t hall;
-    PWM_t PWM;
-    dataSpeed_t data;
-
-    /*
-     *  Pins et instances
+    hall_t hall{0};
+    PWM_t PWM{0};
+// Méthodes primitives
+    /**
+     * Décode les interruptions sur les capteurs à effet Hall pour prévoir la prochaine séquence de commutation des demi-ponts.
+     * Compte les ticks.
+     * Fait à 100 kHz dans le code de Vincent
      */
-    PinName _pinPWM_AH; PinName _pinPWM_AL;
-    PinName _pinPWM_BH; PinName _pinPWM_BL;
-    PinName _pinPWM_CH; PinName _pinPWM_CL;
-    PinName _pinHall_1; PinName _pinHall_2; PinName _pinHall_3;
-    PinName _pinCurrent_A; PinName _pinCurrent_B; PinName _pinCurrent_C;
+    void decodeHall();
+
+    /**
+     * Met à jour les commutation sur les demi-ponts
+     */
+    void updateOutput();
+
+// Méthodes d'asservissements
+    /**
+    * Configure le rapport cyclique pour régler l'intensité du champs magnétique du stator sur le rotor.
+    * Fait à 100Hz dans le code de Vincent (nommée writeCommande)
+    */
+    void setDutyCycle();
+
+    /**
+     * Calcul la vitesse de l'arbre moteur
+     * Fait à 100Hz dans le code de Vincent
+     * @return
+     */
+    int16_t calculateSpeed();
+
+// Pins et instances
+    PinName _pinPWM_AH;
+    PinName _pinPWM_AL;
+    PinName _pinPWM_BH;
+    PinName _pinPWM_BL;
+    PinName _pinPWM_CH;
+    PinName _pinPWM_CL;
+    PinName _pinHall_1;
+    PinName _pinHall_2;
+    PinName _pinHall_3;
+    PinName _pinCurrent_A;
+    PinName _pinCurrent_B;
+    PinName _pinCurrent_C;
 
     InterruptIn *HALL_1;
     InterruptIn *HALL_2;
     InterruptIn *HALL_3;
+
     void hallInterrupt();
 
     AnalogIn *Current_A;
     AnalogIn *Current_B;
     AnalogIn *Current_C;
 
-    /*
-     * Période d'échantillonnage pour les tickers.
-     * TeUs_asserv : période en µs pour la fonction updateController() qui actualise la commande via le PID
-     * TeUs_hall_secure : période en µs pour la lecture des Hall sensors, comme dans le cas où le moteur est très rapide,
-     * il se peut qu'une interruption soit manquée, dans ce cas il y a un risque majeur de court-circuit sur le moteur /!\
-     * Pour éviter cela nous allons mettre en place un processus périodique qui va regarder assez régulièrement l'état des Hall sensors
-<    */
-    const std::chrono::microseconds TeUsController = 10ms;
-    const std::chrono::microseconds TeUsHallSecure = 100us;
-    void _routineController();
-    void _routineHallSecure();
+    Controller* controller;
+
+    std::chrono::microseconds TeUsController = 10ms;
     Ticker _tickerController;
-    Ticker _tickerHallSecure;
-    Ticker _hallSecure;
+    /**
+     * Calcul la vitesse et gère l'asservissement de la vitesse du moteur
+     */
+    void _routineController();
 };
 
 #endif
