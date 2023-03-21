@@ -12,10 +12,11 @@ BrushlessEirbot::BrushlessEirbot(position position_motor, float wheelDiameterMm)
     _positionMotor = position_motor;
     _stateController = activated;
     _wheelDiameterMm = wheelDiameterMm;
+    _sens = clockwise;
+    _ticks = 0;
 
     // Initialisation des structures
     hall = {.h1=0, .h2=0, .h3=0, .h123=0, .prev_h123=0, .ticks=0};
-    PWM = {.aH=1, .aL=0, .bH=1, .bL=0, .cH=0, .cL=0, .sens=clockwise};
 
     _tickerController.attach(callback(this, &BrushlessEirbot::_routineController), TeUsController);
 
@@ -67,9 +68,6 @@ BrushlessEirbot::BrushlessEirbot(position position_motor, float wheelDiameterMm)
     HALL_1->rise(callback(this, &BrushlessEirbot::hallInterrupt));
     HALL_2->rise(callback(this, &BrushlessEirbot::hallInterrupt));
     HALL_3->rise(callback(this, &BrushlessEirbot::hallInterrupt));
-    HALL_1->fall(callback(this, &BrushlessEirbot::hallInterrupt));
-    HALL_2->fall(callback(this, &BrushlessEirbot::hallInterrupt));
-    HALL_3->fall(callback(this, &BrushlessEirbot::hallInterrupt));
 
     Current_A = new AnalogIn(_pinCurrent_A);
     Current_B = new AnalogIn(_pinCurrent_B);
@@ -91,7 +89,6 @@ BrushlessEirbot::~BrushlessEirbot() {
     delete Current_B;
     delete Current_C;
     delete _serial;
-    delete controller;
 }
 
 /* *******************************************************************************
@@ -111,11 +108,10 @@ void BrushlessEirbot::setVelocity(unitVelocity unit, float consigne) {
 }
 
 void BrushlessEirbot::setController(state stateController){
-
+    _stateController = stateController;
 }
 
-
-double BrushlessEirbot::getVelocity(unitVelocity unit) const {
+float BrushlessEirbot::getVelocity(unitVelocity unit) const {
     switch (unit) {
         case rad_s:
             return hall.ticks*(2*M_PI)/ticksPerRevolution; // convert to rad/s
@@ -133,13 +129,13 @@ double BrushlessEirbot::getVelocity(unitVelocity unit) const {
 
 void BrushlessEirbot::setPI(float Kp, float wi, std::chrono::microseconds Te_chrono) {
     TeUsController = Te_chrono;
-    float Te = (float) (TeUsController.count() / 1e-6);
+    float Te = (float)TeUsController.count() / 1e-6;
     controller = new PIController(Kp, wi, Te);
 }
 
 void BrushlessEirbot::setPID(float Kp, float wi, float wb, float wh, std::chrono::microseconds Te_chrono) {
     TeUsController = Te_chrono;
-    float Te = (float) (TeUsController.count() / 1e-6);
+    float Te =  (float) TeUsController.count() / 1e-6;
     controller = new PIDController(Kp, wi, wb, wh, Te);
 }
 
@@ -166,177 +162,82 @@ void BrushlessEirbot::displayPinOut() {
 }
 
 /* *******************************************************************************
- *                              Méthodes primitives
+ *                              Méthodes asservissements
  * *******************************************************************************/
 
-void BrushlessEirbot::decodeHall() {
+void BrushlessEirbot::setDutyCycle(float dutyCycle) {
+    // Configuration du sens de rotation
+    if (dutyCycle >= 0) {_sens = clockwise;}
+    else                {_sens = antiClockwise;}
 
-    hall.h123= (hall.h1<<2) | (hall.h2<<1) | hall.h3;     // for motor sense reading
-    if (PWM.sens == clockwise) {                                   // clockwise
-        PWM.aH = (hall.h1)  && (!hall.h2);
-        PWM.aL = (!hall.h1) && (hall.h2);
-        PWM.bH = (hall.h2)  && (!hall.h3);
-        PWM.bL = (!hall.h2) && (hall.h3);
-        PWM.cH = (!hall.h1) && (hall.h3);
-        PWM.cL = (hall.h1)  && (!hall.h3);
-    } else if (PWM.sens == antiClockwise) {                        // anti-clockwise
-        PWM.aH = (!hall.h1) && (hall.h2);
-        PWM.aL = (hall.h1)  && (!hall.h2);
-        PWM.bH = (!hall.h2) && (hall.h3);
-        PWM.bL = (hall.h2)  && (!hall.h3);
-        PWM.cH = (hall.h1)  && (!hall.h3);
-        PWM.cL = (!hall.h1) && (hall.h3);
-    }
+    // Conversion vers du uint8_t
+    uint8_t dutyCycle_int = (uint8_t) (fabs(dutyCycle)*100);
 
-    // Count ticks
-    if (hall.h123 != hall.prev_h123) {                            //for sense sign reading
-        // 101 -> 100 -> 110 -> 010 -> 011 -> 001 clockwise
-        switch (hall.h123)
-        {
-            case 0b001:
-                if (hall.prev_h123 == 0b011) (hall.ticks)++;      // clockwise
-                else (hall.ticks)--;
-                break;                                            // anti clockwise
-            case 0b010:
-                if (hall.prev_h123 == 0b110) (hall.ticks)++;
-                else (hall.ticks)--;
-                break;
-            case 0b011:
-                if (hall.prev_h123 == 0b010) (hall.ticks)++;
-                else (hall.ticks)--;
-                break;
-            case 0b100:
-                if (hall.prev_h123 == 0b101) (hall.ticks)++;
-                else (hall.ticks)--;
-                break;
-            case 0b101:
-                if (hall.prev_h123 == 0b001) (hall.ticks)++;
-                else (hall.ticks)--;
-                break;
-            case 0b110:
-                if (hall.prev_h123 == 0b100) (hall.ticks)++;
-                else (hall.ticks)--;
-                break;
-            default:
-                break;
-        }
-    }
+    // Saturation
+    if (dutyCycle_int >= DutyCylcleMAX){dutyCycle_int = DutyCylcleMAX;}
 
-    hall.prev_h123 = hall.h123;
+    timerPWM->CCR1 = dutyCycle_int;
+    timerPWM->CCR2 = dutyCycle_int;
+    timerPWM->CCR3 = dutyCycle_int;
 }
 
-void BrushlessEirbot::updateOutput() {
-    if (PWM.aH) {                       //CC1E=1
+/* *******************************************************************************
+ *                     Cadencement des méthodes primaires et asservissement
+ * *******************************************************************************/
+void BrushlessEirbot::hallInterrupt() {
+    // Lecture Hall sensors
+    uint8_t halls = (HALL_1->read()<<2) | (HALL_2->read()<<1) | HALL_3->read();
+
+    // Affectation de la séquence d'après
+    halfBridge_t halfBridge;
+    if (_sens == clockwise){
+        halfBridge = clockwiseSequence[halls-1];
+        _ticks++; // Indentation des ticks
+    }
+    else{
+        halfBridge = antiClockwiseSequence[halls-1];
+        _ticks--; // Indentation des ticks
+    }
+
+    // Mise en oeuvre des commandes
+    if (halfBridge.aH) {                       //CC1E=1
         timerPWM->CCER |= TIM_CCER_CC1E;
     } else {                            //CC1E=0
         timerPWM->CCER &= ~(TIM_CCER_CC1E);
     }
 
-    if (PWM.aL) {                       //CC1NE=1
+    if (halfBridge.aL) {                       //CC1NE=1
         timerPWM->CCER |= TIM_CCER_CC1NE;
     } else {                            //CC1NE=0
         timerPWM->CCER &= ~(TIM_CCER_CC1NE);
     }
 
-    if (PWM.bH) {
+    if (halfBridge.bH) {
         timerPWM->CCER |= TIM_CCER_CC2E;
     } else {
         timerPWM->CCER &= ~(TIM_CCER_CC2E);
     }
 
-    if (PWM.bL) {
+    if (halfBridge.bL) {
         timerPWM->CCER |= TIM_CCER_CC2NE;
     } else {
         timerPWM->CCER &= ~(TIM_CCER_CC2NE);
     }
 
-    if (PWM.cH) {
+    if (halfBridge.cH) {
         timerPWM->CCER |= TIM_CCER_CC3E;
     } else {
         timerPWM->CCER &= ~(TIM_CCER_CC3E);
     }
 
-    if (PWM.cL) {
+    if (halfBridge.cL) {
         timerPWM->CCER |= TIM_CCER_CC3NE;
     } else {
         timerPWM->CCER &= ~(TIM_CCER_CC3NE);
     }
 }
 
-/* *******************************************************************************
- *                              Méthodes asservissements
- * *******************************************************************************/
-
-//void BrushlessEirbot::setDutyCycle() {
-//    /*
-//     * Impose le rapport cyclique pour régler l'intensité magnétique d'accroche du rotor.
-//     */
-//    if ((data.cmdsat >= 0) && (data.cmdsat <= DC_MAX))          // clockwise
-//    {
-//        PWM.sens = clockwise;
-//        timerPWM->CCR1 = 25;
-//        timerPWM->CCR2 = 35;
-//        timerPWM->CCR3 = 45;
-//    } else if ((data.cmdsat >= DC_MIN) && (data.cmdsat < 0))    // anti clockwise
-//    {
-//        PWM.sens = antiClockwise;
-//        timerPWM->CCR1 = -data.cmdsat;
-//        timerPWM->CCR2 = -data.cmdsat;
-//        timerPWM->CCR3 = -data.cmdsat;
-//    } else                                                      //error state -. PWM off
-//    {
-//        PWM.sens = clockwise;
-//        timerPWM->CCR1 = 0;
-//        timerPWM->CCR2 = 0;
-//        timerPWM->CCR3 = 0;
-//    }
-//}
-
-int16_t BrushlessEirbot::calculateSpeed() {
-    /*
-     * Calculate motor speed using hall effect sensor
-     * called every 10ms (100Hz)
-     * return measurement_L.speed in tick/s
-     * resolution : 1/p mechanical turn  -> 48ticks for 1turn
-     */
-    if (hall.ticks > 240)
-        return (int16_t) MAX_SPEED;
-    else if (hall.ticks < -240)
-        return (int16_t) MIN_SPEED;
-    else
-        return 100 * hall.ticks;
-}
-
-/* *******************************************************************************
- *                     Cadencement des méthodes primaires et asservissment
- * *******************************************************************************/
-void BrushlessEirbot::hallInterrupt() {
-    // Lecture Hall sensors
-    hall.h1 = HALL_1->read();
-    hall.h2 = HALL_2->read();
-    hall.h3 = HALL_3->read();
-
-    // Affectation de la séquence d'après
-    hall.h123= (hall.h1<<2) | (hall.h2<<1) | hall.h3; // for motor sense reading
-    if (PWM.sens == clockwise) {
-        PWM.aH = (hall.h1)  && (!hall.h2);
-        PWM.aL = (!hall.h1) && (hall.h2);
-        PWM.bH = (hall.h2)  && (!hall.h3);
-        PWM.bL = (!hall.h2) && (hall.h3);
-        PWM.cH = (!hall.h1) && (hall.h3);
-        PWM.cL = (hall.h1)  && (!hall.h3);
-    } else if (PWM.sens == antiClockwise) {
-        PWM.aH = (!hall.h1) && (hall.h2);
-        PWM.aL = (hall.h1)  && (!hall.h2);
-        PWM.bH = (!hall.h2) && (hall.h3);
-        PWM.bL = (hall.h2)  && (!hall.h3);
-        PWM.cH = (hall.h1)  && (!hall.h3);
-        PWM.cL = (!hall.h1) && (hall.h3);
-    }
-}
-
 void BrushlessEirbot::_routineController(){
-
     // TODO Asservissement routine
 }
 

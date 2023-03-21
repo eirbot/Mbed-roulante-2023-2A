@@ -10,66 +10,72 @@
 
 #define MAX_SPEED            20000
 #define MIN_SPEED            (-20000)
-#define DC_MIN               (-90)
-#define DC_MAX               90
+#define DutyCylcleMAX        90
 #define ticksPerRevolution   (14*48)
 
+typedef struct {
+    bool aH;
+    bool aL;
+    bool bH;
+    bool bL;
+    bool cH;
+    bool cL;
+} halfBridge_t;
 
-//
-///**  The following Table  describes the TIM1 Channels states (counterclockwise):
-//  -----------------------------------------------------------
-//  |Hall 1/2/3|  101  |  100  |  110  |  010  |  011  |  001  |
-//   ----------------------------------------------------------
-//  | aH-Ch1   |   0   |   0   |   0   |   1   |   1   |   0   |
-//   --------  --------------------------------------------------
-//  | aL-Ch1N  |   1   |   1   |   0   |   0   |   0   |   0   |
-//   --------  --------------------------------------------------
-//  | bH-Ch2   |   1   |   0   |   0   |   0   |   0   |   1   |
-//   --------  --------------------------------------------------
-//  | bL-Ch2N  |   0   |   0   |   1   |   1   |   0   |   0   |
-//   --------  --------------------------------------------------
-//  | cH-Ch3   |   0   |   1   |   1   |   0   |   0   |   0   |
-//   --------  --------------------------------------------------
-//  | cL-Ch3N  |   0   |   0   |   0   |   0   |   1   |   1   |
-//   ----------------------------------------------------------
-//
-//   001 -> 011 -> 010 -> 110 -> 100 -> 101
-//*/
-//const PWM_t clockwiseSequence[6] = {
-//        {0,0,1,0,0,1}, // 0b001
-//        {1,0,0,1,0,0}, // 0b010
-//        {1,0,0,0,0,1}, // 0b011
-//        {0,1,0,0,1,0}, // 0b100
-//        {0,1,1,0,0,0}, // 0b101
-//        {0,0,0,1,1,0}, // 0b110
-//};
-///**  The following Table  describes the TIM1 Channels states (clockwise):
-//  -----------------------------------------------------------
-//  |Hall 1/2/3|  101  |  100  |  110  |  010  |  011  |  001  |
-//   ----------------------------------------------------------
-//  | aH-Ch1   |   1   |   1   |   0   |   0   |   0   |   0   |
-//   --------  --------------------------------------------------
-//  | aL-Ch1N  |   0   |   0   |   0   |   1   |   1   |   0   |
-//   --------  --------------------------------------------------
-//  | bH-Ch2   |   0   |   0   |   1   |   1   |   0   |   0   |
-//   --------  --------------------------------------------------
-//  | bL-Ch2N  |   1   |   0   |   0   |   0   |   0   |   1   |
-//   --------  --------------------------------------------------
-//  | cH-Ch3   |   0   |   0   |   0   |   0   |   1   |   1   |
-//   --------  --------------------------------------------------
-//  | cL-Ch3N  |   0   |   1   |   1   |   0   |   0   |   0   |
-//   ----------------------------------------------------------
-//
-//   101 -> 100 -> 110 -> 010 -> 011 -> 001
-//*/
-//const PWM_t antiClockwiseSequence[6] = {
-//        {0,0,0,1,1,0}, // 0b001
-//        {0,1,1,0,0,0}, // 0b010
-//        {0,1,0,0,1,0}, // 0b011
-//        {1,0,0,0,0,1}, // 0b100
-//        {1,0,0,1,0,0}, // 0b101
-//        {0,0,1,0,0,1}, // 0b110
-//};
+/**  The following Table  describes the TIM1 Channels states (counterclockwise):
+  -----------------------------------------------------------
+  |Hall 1/2/3|  101  |  100  |  110  |  010  |  011  |  001  |
+   ----------------------------------------------------------
+  | aH-Ch1   |   0   |   0   |   0   |   1   |   1   |   0   |
+   --------  --------------------------------------------------
+  | aL-Ch1N  |   1   |   1   |   0   |   0   |   0   |   0   |
+   --------  --------------------------------------------------
+  | bH-Ch2   |   1   |   0   |   0   |   0   |   0   |   1   |
+   --------  --------------------------------------------------
+  | bL-Ch2N  |   0   |   0   |   1   |   1   |   0   |   0   |
+   --------  --------------------------------------------------
+  | cH-Ch3   |   0   |   1   |   1   |   0   |   0   |   0   |
+   --------  --------------------------------------------------
+  | cL-Ch3N  |   0   |   0   |   0   |   0   |   1   |   1   |
+   ----------------------------------------------------------
+
+   001 -> 011 -> 010 -> 110 -> 100 -> 101
+*/
+const halfBridge_t clockwiseSequence[6] = {
+        {0,0,1,0,0,1}, // 0b001
+        {1,0,0,1,0,0}, // 0b010
+        {1,0,0,0,0,1}, // 0b011
+        {0,1,0,0,1,0}, // 0b100
+        {0,1,1,0,0,0}, // 0b101
+        {0,0,0,1,1,0}, // 0b110
+};
+/**  The following Table  describes the TIM1 Channels states (clockwise):
+  -----------------------------------------------------------
+  |Hall 1/2/3|  101  |  100  |  110  |  010  |  011  |  001  |
+   ----------------------------------------------------------
+  | aH-Ch1   |   1   |   1   |   0   |   0   |   0   |   0   |
+   --------  --------------------------------------------------
+  | aL-Ch1N  |   0   |   0   |   0   |   1   |   1   |   0   |
+   --------  --------------------------------------------------
+  | bH-Ch2   |   0   |   0   |   1   |   1   |   0   |   0   |
+   --------  --------------------------------------------------
+  | bL-Ch2N  |   1   |   0   |   0   |   0   |   0   |   1   |
+   --------  --------------------------------------------------
+  | cH-Ch3   |   0   |   0   |   0   |   0   |   1   |   1   |
+   --------  --------------------------------------------------
+  | cL-Ch3N  |   0   |   1   |   1   |   0   |   0   |   0   |
+   ----------------------------------------------------------
+
+   101 -> 100 -> 110 -> 010 -> 011 -> 001
+*/
+const halfBridge_t antiClockwiseSequence[6] = {
+        {0,0,0,1,1,0}, // 0b001
+        {0,1,1,0,0,0}, // 0b010
+        {0,1,0,0,1,0}, // 0b011
+        {1,0,0,0,0,1}, // 0b100
+        {1,0,0,1,0,0}, // 0b101
+        {0,0,1,0,0,1}, // 0b110
+};
 
 enum rotationSens_t {
     clockwise, antiClockwise
@@ -83,15 +89,7 @@ enum position {
 enum unitVelocity {
     rad_s, tick_s, mm_s
 };
-typedef struct {
-    bool aH;
-    bool aL;
-    bool bH;
-    bool bL;
-    bool cH;
-    bool cL;
-    rotationSens_t sens;
-} PWM_t;
+
 typedef struct {
     bool h1;
     bool h2;
@@ -163,7 +161,7 @@ public:
      * @param unit : Soit en rad_s (radian par seconde), tick_s (ticks par seconde), mm_s (millimètre par seconde)
      * @return double velocity
      */
-    double getVelocity(unitVelocity unit) const;
+    float getVelocity(unitVelocity unit) const;
 
     /**
     * Affiche sur le port de debug le pinOut
@@ -171,17 +169,30 @@ public:
     */
     void displayPinOut();
 
+    /**
+ * Met à jour les commutation sur les demi-ponts
+ */
+    void updateOutput();
+
+// Méthodes d'asservissements
+    /**
+    * Configure le rapport cyclique pour régler l'intensité du champs magnétique du stator sur le rotor.
+    * Fait à 100Hz dans le code de Vincent (nommée writeCommande)
+    */
+    void setDutyCycle(float dutyCycle);
+
+
 private:
     state _stateController;
     Timer _timerVelocity;
     position _positionMotor;
     float _wheelDiameterMm;
-
+    rotationSens_t _sens;
+    int32_t _ticks;
     BufferedSerial *_serial{0};
     bool _debug{false};
 
     hall_t hall{0};
-    PWM_t PWM{0};
 // Méthodes primitives
     /**
      * Décode les interruptions sur les capteurs à effet Hall pour prévoir la prochaine séquence de commutation des demi-ponts.
@@ -190,17 +201,6 @@ private:
      */
     void decodeHall();
 
-    /**
-     * Met à jour les commutation sur les demi-ponts
-     */
-    void updateOutput();
-
-// Méthodes d'asservissements
-    /**
-    * Configure le rapport cyclique pour régler l'intensité du champs magnétique du stator sur le rotor.
-    * Fait à 100Hz dans le code de Vincent (nommée writeCommande)
-    */
-    void setDutyCycle();
 
     /**
      * Calcul la vitesse de l'arbre moteur

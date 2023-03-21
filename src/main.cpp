@@ -7,7 +7,7 @@
 DigitalOut led(LED1);
 BufferedSerial pc(USBTX, USBRX, 115200);
 
-BrushlessEirbot motorLeft(Left, 78);
+//BrushlessEirbot motorLeft(Left, 78);
 BrushlessEirbot motorRight(Right, 78);
 
 // ================================== DEBUG ==================================
@@ -24,9 +24,12 @@ int main() {
     led.write(0);
     motorRight.displayPinOut();
 
-    motorRight.setVelocity(tick_s, 700);
+//    motorRight.setVelocity(tick_s, 700);
+    motorRight.setDutyCycle(0.5);
 
     led.write(1);
+    ThisThread::sleep_for(1s);
+    motorRight.setDutyCycle(0);
     while (true) {
         led = !led;
         ThisThread::sleep_for(1s);
