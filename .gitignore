@@ -3,7 +3,7 @@
 projectfiles
 *.py*
 mbed-os
-BUILD
+BUILD/*
 CMakeLists.txt
 cmake-*/
 .idea/

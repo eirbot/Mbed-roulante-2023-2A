@@ -1,6 +1,8 @@
 #include "BrushlessEirbot.hpp"
 
-#include "tim.h"
+#define DutyCylcleMAX        90
+#define ticksPerRevolution   (14*48)
+
 
 void TIMER1_init(){
     MX_TIM1_Init();
@@ -22,6 +24,7 @@ void TIMER8_init(){
     HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_3);
     HAL_TIMEx_PWMN_Start(&htim8, TIM_CHANNEL_3);
 }
+
 
 /* *******************************************************************************
  *                          Constructeur et destructeurs
@@ -50,12 +53,10 @@ BrushlessEirbot::BrushlessEirbot(position position_motor, float wheelDiameterMm)
         _pinCurrent_A = PC_0;
         _pinCurrent_B = PC_1;
         _pinCurrent_C = PC_2;
-        buffer = "\t TIMER 1\n";
-        _serial->write(buffer.c_str(), buffer.length());
 #ifndef timerPWM
 #define timerPWM TIM1
 #endif
-        TIMER1_init(); // Le init doit être défini en "dur" ou en méthode static
+        TIMER1_init();
     }
     else if (_positionMotor == Right) {
         // Configuration des Hall Sensors
@@ -67,7 +68,11 @@ BrushlessEirbot::BrushlessEirbot(position position_motor, float wheelDiameterMm)
         _pinCurrent_A = PC_3;
         _pinCurrent_B = PC_4;
         _pinCurrent_C = PC_5;
-}
+#ifndef timerPWM
+#define timerPWM TIM8
+#endif
+        TIMER8_init();
+    }
 
     HALL_1 = new InterruptIn(_pinHall_1, PullNone);
     HALL_2 = new InterruptIn(_pinHall_2, PullNone);
@@ -103,28 +108,36 @@ BrushlessEirbot::~BrushlessEirbot() {
     }
 }
 
-void BrushlessEirbot::delamrd() {
+void BrushlessEirbot::init(){
+//    if (_positionMotor == Left) {
 //#ifndef timerPWM
 //#define timerPWM TIM1
 //#endif
-//    TIMER1_init(); // Le init doit être défini en "dur" ou en méthode static
+//        TIMER1_init(); // Le init doit être défini en "dur" ou en méthode static
+//
+//    }
+//    else if (_positionMotor == Right) {
+//#ifndef timerPWM
+//#define timerPWM TIM8
+//#endif
+//        TIMER8_init(); // Le init doit être défini en "dur" ou en méthode static
+//    }
 }
 
 /* *******************************************************************************
  *                              Méthodes publiques
  * *******************************************************************************/
-
 void BrushlessEirbot::setVelocity(unitVelocity unit, float consigne) {
-    //TODO Mettre en forme le controller
+    //TODO Mettre en forme le controller et les conversions
     _stateController = activated;
-    switch (unit) {
-        case rad_s:
-            break;
-        case tick_s:
-            break;
-        case mm_s:
-            break;
-    }
+//    switch (unit) {
+//        case rad_s:
+//            break;
+//        case tick_s:
+//            break;
+//        case mm_s:
+//            break;
+//    }
 }
 
 void BrushlessEirbot::setController(state stateController){
@@ -158,9 +171,6 @@ void BrushlessEirbot::setPID(float Kp, float wi, float wb, float wh, std::chrono
     controller = new PIDController(Kp, wi, wb, wh, Te);
 }
 
-/* *******************************************************************************
- *                              Méthodes asservissements
- * *******************************************************************************/
 
 void BrushlessEirbot::setDutyCycle(float dutyCycle) {
     // Configuration du sens de rotation
@@ -237,18 +247,6 @@ void BrushlessEirbot::hallInterrupt() {
     }
 }
 
-void BrushlessEirbot::_routineController(){
-    // TODO Asservissement routine
-//    buffer = "Ticks "+to_string(_ticks)+"\n";
-//    _serial->write(buffer.c_str(), buffer.length());
+void BrushlessEirbot::_routineController() {
+
 }
-
-state BrushlessEirbot::getStateController() const {
-    return _stateController;
-}
-
-
-
-
-
-

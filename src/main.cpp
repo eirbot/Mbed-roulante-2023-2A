@@ -1,22 +1,22 @@
 // ============= INCLUDES =================
 #include "mbed.h"
 #include "BrushlessEirbot.hpp"
+#include "tim.h"
 // ============= DEFINITIONS =================
-BufferedSerial pc(USBTX, USBRX, 115200);
 DigitalOut led(LED1);
-BrushlessEirbot motor(&pc,Left, 78);
+BufferedSerial pc(USBTX, USBRX, 115200);
+BrushlessEirbot motorL(&pc, Left, 78);
+BrushlessEirbot motorR(&pc, Right, 78);
 
 
-// ============= MAIN =================
+
 int main() {
-    led.write(0);
-//    motorRight.delamrd();
-    TIM1->CCR1 = 25; TIM1->CCR2 = 25; TIM1->CCR3 = 25;
-    led.write(1);
-
+    led = 0;
+    TIM1->CCR1 = 25;
+    TIM8->CCR1 = 25;
+    led = 1;
     while (true) {
         led = !led;
         ThisThread::sleep_for(1s);
     }
-
 }

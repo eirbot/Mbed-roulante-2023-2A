@@ -79,9 +79,7 @@ void MX_TIM1_Init(void)
     {
         Error_Handler();
     }
-    /* USER CODE BEGIN TIM1_Init 2 */
 
-    /* USER CODE END TIM1_Init 2 */
     HAL_TIM_MspPostInit(&htim1);
 
 }
@@ -109,7 +107,7 @@ void MX_TIM8_Init(void)
     {
         Error_Handler();
     }
-    if (HAL_TIM_OC_Init(&htim8) != HAL_OK)
+    if (HAL_TIM_PWM_Init(&htim8) != HAL_OK)
     {
         Error_Handler();
     }
@@ -119,29 +117,29 @@ void MX_TIM8_Init(void)
     {
         Error_Handler();
     }
-    sConfigOC.OCMode = TIM_OCMODE_TIMING;
+    sConfigOC.OCMode = TIM_OCMODE_PWM1;
     sConfigOC.Pulse = 0;
     sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
     sConfigOC.OCNPolarity = TIM_OCNPOLARITY_HIGH;
     sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
     sConfigOC.OCIdleState = TIM_OCIDLESTATE_RESET;
     sConfigOC.OCNIdleState = TIM_OCNIDLESTATE_RESET;
-    if (HAL_TIM_OC_ConfigChannel(&htim8, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+    if (HAL_TIM_PWM_ConfigChannel(&htim8, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
     {
         Error_Handler();
     }
-    if (HAL_TIM_OC_ConfigChannel(&htim8, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
+    if (HAL_TIM_PWM_ConfigChannel(&htim8, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
     {
         Error_Handler();
     }
-    if (HAL_TIM_OC_ConfigChannel(&htim8, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
+    if (HAL_TIM_PWM_ConfigChannel(&htim8, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
     {
         Error_Handler();
     }
-    sBreakDeadTimeConfig.OffStateRunMode = TIM_OSSR_DISABLE;
+    sBreakDeadTimeConfig.OffStateRunMode = TIM_OSSR_ENABLE;
     sBreakDeadTimeConfig.OffStateIDLEMode = TIM_OSSI_DISABLE;
     sBreakDeadTimeConfig.LockLevel = TIM_LOCKLEVEL_OFF;
-    sBreakDeadTimeConfig.DeadTime = 0;
+    sBreakDeadTimeConfig.DeadTime = 2;
     sBreakDeadTimeConfig.BreakState = TIM_BREAK_DISABLE;
     sBreakDeadTimeConfig.BreakPolarity = TIM_BREAKPOLARITY_HIGH;
     sBreakDeadTimeConfig.AutomaticOutput = TIM_AUTOMATICOUTPUT_DISABLE;
@@ -151,15 +149,14 @@ void MX_TIM8_Init(void)
     }
 
     HAL_TIM_MspPostInit(&htim8);
-}
 
+}
 void HAL_TIM_MspPostInit(TIM_HandleTypeDef* timHandle)
 {
+
     GPIO_InitTypeDef GPIO_InitStruct = {0};
     if(timHandle->Instance==TIM1)
     {
-        __HAL_RCC_TIM1_CLK_ENABLE(); // vient de HAL_TIM_Base_MspInit
-
         __HAL_RCC_GPIOB_CLK_ENABLE();
         __HAL_RCC_GPIOA_CLK_ENABLE();
         /**TIM1 GPIO Configuration
@@ -183,15 +180,9 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef* timHandle)
         GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
         GPIO_InitStruct.Alternate = GPIO_AF1_TIM1;
         HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-        /* USER CODE BEGIN TIM1_MspPostInit 1 */
-
-        /* USER CODE END TIM1_MspPostInit 1 */
     }
     else if(timHandle->Instance==TIM8)
     {
-        __HAL_RCC_TIM8_CLK_ENABLE(); // vient de HAL_TIM_Base_MspInit
-
         __HAL_RCC_GPIOA_CLK_ENABLE();
         __HAL_RCC_GPIOB_CLK_ENABLE();
         __HAL_RCC_GPIOC_CLK_ENABLE();
@@ -224,4 +215,6 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef* timHandle)
         GPIO_InitStruct.Alternate = GPIO_AF3_TIM8;
         HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
     }
+
 }
+
