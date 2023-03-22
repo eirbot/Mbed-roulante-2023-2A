@@ -1,37 +1,22 @@
-// ================================= INCLUDES ================================
-#include"mbed.h"
+// ============= INCLUDES =================
+#include "mbed.h"
 #include "BrushlessEirbot.hpp"
-#include "SerialPlot.hpp"
-
-// ========================== Variables Globales ==============================
-DigitalOut led(LED1);
+// ============= DEFINITIONS =================
 BufferedSerial pc(USBTX, USBRX, 115200);
+DigitalOut led(LED1);
+BrushlessEirbot motor(&pc,Left, 78);
 
-//BrushlessEirbot motorLeft(Left, 78);
-BrushlessEirbot motorRight(Right, 78);
 
-// ================================== DEBUG ==================================
-double i;
-double j;
-#define numberVariables 2
-double** SerialPlot::_variables = new double*[numberVariables]{&i, &j};
-SerialPlot debugger(&pc,numberVariables, 10ms);
-
-// ================================== MAIN ====================================
+// ============= MAIN =================
 int main() {
-    debugger.run();
-
     led.write(0);
-    motorRight.displayPinOut();
-
-//    motorRight.setVelocity(tick_s, 700);
-    motorRight.setDutyCycle(0.5);
-
+//    motorRight.delamrd();
+    TIM1->CCR1 = 25; TIM1->CCR2 = 25; TIM1->CCR3 = 25;
     led.write(1);
-    ThisThread::sleep_for(1s);
-    motorRight.setDutyCycle(0);
+
     while (true) {
         led = !led;
         ThisThread::sleep_for(1s);
     }
+
 }

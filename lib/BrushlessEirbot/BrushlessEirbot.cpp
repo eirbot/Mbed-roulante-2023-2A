@@ -1,5 +1,28 @@
 #include "BrushlessEirbot.hpp"
 
+#include "tim.h"
+
+void TIMER1_init(){
+    MX_TIM1_Init();
+
+    HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
+    HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_1);
+    HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
+    HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_2);
+    HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);
+    HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_3);
+}
+void TIMER8_init(){
+    MX_TIM8_Init();
+
+    HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_1);
+    HAL_TIMEx_PWMN_Start(&htim8, TIM_CHANNEL_1);
+    HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_2);
+    HAL_TIMEx_PWMN_Start(&htim8, TIM_CHANNEL_2);
+    HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_3);
+    HAL_TIMEx_PWMN_Start(&htim8, TIM_CHANNEL_3);
+}
+
 /* *******************************************************************************
  *                          Constructeur et destructeurs
  * *******************************************************************************/
@@ -15,9 +38,6 @@ BrushlessEirbot::BrushlessEirbot(position position_motor, float wheelDiameterMm)
     _sens = clockwise;
     _ticks = 0;
 
-    // Initialisation des structures
-    hall = {.h1=0, .h2=0, .h3=0, .h123=0, .prev_h123=0, .ticks=0};
-
     _tickerController.attach(callback(this, &BrushlessEirbot::_routineController), TeUsController);
 
     if (_positionMotor == Left) {
@@ -30,19 +50,12 @@ BrushlessEirbot::BrushlessEirbot(position position_motor, float wheelDiameterMm)
         _pinCurrent_A = PC_0;
         _pinCurrent_B = PC_1;
         _pinCurrent_C = PC_2;
-
-        // Configuration du timer 1
-        MX_TIM1_Init();
-        #ifndef timerPWM
-        #define timerPWM TIM1
-        #endif
-        // Configuration des Current Sensors
-        _pinPWM_AH = PC_6;
-        _pinPWM_AL = PA_7;
-        _pinPWM_BH = PC_7;
-        _pinPWM_BL = PB_14;
-        _pinPWM_CH = PC_8;
-        _pinPWM_CL = PB_15;
+        buffer = "\t TIMER 1\n";
+        _serial->write(buffer.c_str(), buffer.length());
+#ifndef timerPWM
+#define timerPWM TIM1
+#endif
+        TIMER1_init(); // Le init doit être défini en "dur" ou en méthode static
     }
     else if (_positionMotor == Right) {
         // Configuration des Hall Sensors
@@ -54,13 +67,7 @@ BrushlessEirbot::BrushlessEirbot(position position_motor, float wheelDiameterMm)
         _pinCurrent_A = PC_3;
         _pinCurrent_B = PC_4;
         _pinCurrent_C = PC_5;
-
-        // Configuration du timer 8
-        MX_TIM8_Init();
-        #ifndef timerPWM
-        #define timerPWM TIM8
-        #endif
-    }
+}
 
     HALL_1 = new InterruptIn(_pinHall_1, PullNone);
     HALL_2 = new InterruptIn(_pinHall_2, PullNone);
@@ -77,6 +84,9 @@ BrushlessEirbot::BrushlessEirbot(position position_motor, float wheelDiameterMm)
 BrushlessEirbot::BrushlessEirbot(BufferedSerial *pc, position position_motor, float wheelDiameterMm): BrushlessEirbot(position_motor, wheelDiameterMm) {
     _debug = true;
     _serial = pc;
+    buffer = "Constructeur ";
+    _serial->write(buffer.c_str(), buffer.length());
+
 }
 
 BrushlessEirbot::~BrushlessEirbot() {
@@ -88,7 +98,16 @@ BrushlessEirbot::~BrushlessEirbot() {
     delete Current_A;
     delete Current_B;
     delete Current_C;
-    delete _serial;
+    if(_debug) {
+        delete _serial;
+    }
+}
+
+void BrushlessEirbot::delamrd() {
+//#ifndef timerPWM
+//#define timerPWM TIM1
+//#endif
+//    TIMER1_init(); // Le init doit être défini en "dur" ou en méthode static
 }
 
 /* *******************************************************************************
@@ -96,6 +115,7 @@ BrushlessEirbot::~BrushlessEirbot() {
  * *******************************************************************************/
 
 void BrushlessEirbot::setVelocity(unitVelocity unit, float consigne) {
+    //TODO Mettre en forme le controller
     _stateController = activated;
     switch (unit) {
         case rad_s:
@@ -112,15 +132,14 @@ void BrushlessEirbot::setController(state stateController){
 }
 
 float BrushlessEirbot::getVelocity(unitVelocity unit) const {
+    // TODO Fixé le timer pour résoudre le problème temporel
     switch (unit) {
         case rad_s:
-            return hall.ticks*(2*M_PI)/ticksPerRevolution; // convert to rad/s
-            break;
+            return _ticks*M_2_PI/ticksPerRevolution; // convert to rad/s
         case tick_s:
-            // convert to tick/s
-            break;
+            return _ticks; // convert to tick/s
         case mm_s:
-            // convert to mm/s
+            return _ticks*M_2_PI*_wheelDiameterMm; // convert to mm/s
             break;
         default:
             return (MAXFLOAT);
@@ -129,36 +148,14 @@ float BrushlessEirbot::getVelocity(unitVelocity unit) const {
 
 void BrushlessEirbot::setPI(float Kp, float wi, std::chrono::microseconds Te_chrono) {
     TeUsController = Te_chrono;
-    float Te = (float)TeUsController.count() / 1e-6;
+    float Te = (float)TeUsController.count() / float(1e-6);
     controller = new PIController(Kp, wi, Te);
 }
 
 void BrushlessEirbot::setPID(float Kp, float wi, float wb, float wh, std::chrono::microseconds Te_chrono) {
     TeUsController = Te_chrono;
-    float Te =  (float) TeUsController.count() / 1e-6;
+    float Te =  (float) TeUsController.count() / float(1e-6);
     controller = new PIDController(Kp, wi, wb, wh, Te);
-}
-
-void BrushlessEirbot::displayPinOut() {
-    if (_debug){
-        std::string buffer("PMW on half-bridges :\n");
-        buffer.append(to_string(_pinPWM_AH) + "\t");
-        buffer.append(to_string(_pinPWM_AL) + "\n");
-        buffer.append(to_string(_pinPWM_BH) + "\t");
-        buffer.append(to_string(_pinPWM_BL) + "\n");
-        buffer.append(to_string(_pinPWM_CH) + "\t");
-        buffer.append(to_string(_pinPWM_CL) + "\n");
-        buffer.append("Hall sensors :\n");
-        buffer.append(to_string(_pinHall_1) + "\n");
-        buffer.append(to_string(_pinHall_2) + "\n");
-        buffer.append(to_string(_pinHall_3) + "\n");
-        buffer.append("Currents sensors :\n");
-        buffer.append(to_string(_pinCurrent_A) + "\n");
-        buffer.append(to_string(_pinCurrent_B) + "\n");
-        buffer.append(to_string(_pinCurrent_C) + "\n");
-
-        _serial->write(buffer.c_str(), buffer.length());
-    }
 }
 
 /* *******************************************************************************
@@ -171,7 +168,10 @@ void BrushlessEirbot::setDutyCycle(float dutyCycle) {
     else                {_sens = antiClockwise;}
 
     // Conversion vers du uint8_t
-    uint8_t dutyCycle_int = (uint8_t) (fabs(dutyCycle)*100);
+    uint8_t dutyCycle_int = (uint8_t) (fabs(dutyCycle)*100); //FIXME Augmenter la résolution du comparateur (penser à changer prescaler)
+
+    buffer = "dutyCycle"+ to_string(dutyCycle_int)+"\n";
+    _serial->write(buffer.c_str(), buffer.length());
 
     // Saturation
     if (dutyCycle_int >= DutyCylcleMAX){dutyCycle_int = DutyCylcleMAX;}
@@ -239,7 +239,16 @@ void BrushlessEirbot::hallInterrupt() {
 
 void BrushlessEirbot::_routineController(){
     // TODO Asservissement routine
+//    buffer = "Ticks "+to_string(_ticks)+"\n";
+//    _serial->write(buffer.c_str(), buffer.length());
 }
+
+state BrushlessEirbot::getStateController() const {
+    return _stateController;
+}
+
+
+
 
 
 

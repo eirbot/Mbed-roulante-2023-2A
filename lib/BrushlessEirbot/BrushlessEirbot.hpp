@@ -3,7 +3,6 @@
 
 #include <cmath>
 #include "mbed.h"
-#include "tim.h"
 #include "Controllers/Controller.h"
 #include "Controllers/PIController.h"
 #include "Controllers/PIDController.h"
@@ -102,6 +101,9 @@ typedef struct {
 
 class BrushlessEirbot {
 public:
+    state getStateController() const;
+
+    void delamrd();
     /**
      * Constructeur de l'object BrushlessEirbot avec l'information de la position du moteur. La position détermine le timer spécial utilisé.
      * Ils sont au nombre de 2 (timer1 et timer8)
@@ -164,14 +166,8 @@ public:
     float getVelocity(unitVelocity unit) const;
 
     /**
-    * Affiche sur le port de debug le pinOut
-    * Faisable seulement si le port de debug à été configuré
+    * Met à jour les commutation sur les demi-ponts
     */
-    void displayPinOut();
-
-    /**
- * Met à jour les commutation sur les demi-ponts
- */
     void updateOutput();
 
 // Méthodes d'asservissements
@@ -189,10 +185,11 @@ private:
     float _wheelDiameterMm;
     rotationSens_t _sens;
     int32_t _ticks;
-    BufferedSerial *_serial{0};
+    BufferedSerial *_serial;
     bool _debug{false};
+    std::string buffer;
+    char cbuffer[20]{0};
 
-    hall_t hall{0};
 // Méthodes primitives
     /**
      * Décode les interruptions sur les capteurs à effet Hall pour prévoir la prochaine séquence de commutation des demi-ponts.
@@ -200,7 +197,6 @@ private:
      * Fait à 100 kHz dans le code de Vincent
      */
     void decodeHall();
-
 
     /**
      * Calcul la vitesse de l'arbre moteur
