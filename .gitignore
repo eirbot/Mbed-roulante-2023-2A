@@ -1,9 +1,22 @@
+# Build
 .build
+BUILD/*
+
+
 .mbed
 projectfiles
 *.py*
-mbed-os
-BUILD/*
-CMakeLists.txt
-cmake-*/
+mbed-os/*
+
 .idea/
+
+# Documentation
+Doxygen/*
+
+# Aide à la compilation
+CMakeLists.txt
+cmake-build-debug/*
+
+GettingStarted.html
+
+

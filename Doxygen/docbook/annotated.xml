@@ -1,4 +1,0 @@
-<?xml version='1.0' encoding='UTF-8' standalone='no'?>
-<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="_annotated" xml:lang="fr">
-<title>Liste des classes</title>
-Liste des classes, structures, unions et interfaces avec une brève description :<link linkend="_class_brushless_eirbot">BrushlessEirbot</link><link linkend="_structdata_speed__t">dataSpeed_t</link><link linkend="_structhall__t">hall_t</link><link linkend="_class_odometer">Odometer</link><link linkend="_class_p_i_controller">PIController</link><link linkend="_class_p_i_d_controller">PIDController</link><link linkend="_struct_p_w_m__t">PWM_t</link><link linkend="_class_robot">Robot</link><link linkend="_class_serial_plot">SerialPlot</link></section>

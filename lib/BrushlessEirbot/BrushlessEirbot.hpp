@@ -1,11 +1,18 @@
-#ifndef brushless_hpp
-#define brushless_hpp
+#ifndef BRUSHLESS_BASE_ROULANTE_BRUSHLESSEIRBOT_H
+#define BRUSHLESS_BASE_ROULANTE_BRUSHLESSEIRBOT_H
+
+#include "BrushlessEirbot.hpp"
+
+#include "Controller.h"
+#include "PIDController.h"
+#include "PIController.h"
+#include "tim.h"
 
 #include "mbed.h"
-#include "../Controllers/Controller.h"
-#include "../Controllers/PIDController.h"
-#include "../Controllers/PIController.h"
-#include "tim.h"
+
+#define DutyCycleMAX 90
+#define TickPerRevolution 48
+#define Reductor 14
 
 void TIMER1_init();
 void TIMER8_init();
@@ -18,21 +25,21 @@ typedef struct {
     bool cH;
     bool cL;
 } halfBridge_t;
-const halfBridge_t clockwiseSequence[6] = {
-        {0,0,1,0,0,1}, // 0b001
-        {1,0,0,1,0,0}, // 0b010
-        {1,0,0,0,0,1}, // 0b011
-        {0,1,0,0,1,0}, // 0b100
-        {0,1,1,0,0,0}, // 0b101
-        {0,0,0,1,1,0}, // 0b110
+const halfBridge_t clockwiseSequence[6] = { //  101 -> 001 -> 011 -> 010 -> 110 -> 100
+        {false,true, false,false,true, false}, // 0b001
+        {true, false,false,true, false,false}, // 0b010
+        {true, false,false,false,false,true},  // 0b011
+        {false,true, false,false,true, false}, // 0b100
+        {false,true, true, false,false,false}, // 0b101
+        {false,false,false,true, true, false}, // 0b110
 };
 const halfBridge_t antiClockwiseSequence[6] = {
-        {0,0,0,1,1,0}, // 0b001
-        {0,1,1,0,0,0}, // 0b010
-        {0,1,0,0,1,0}, // 0b011
-        {1,0,0,0,0,1}, // 0b100
-        {1,0,0,1,0,0}, // 0b101
-        {0,0,1,0,0,1}, // 0b110
+        {false,false,false, true,true, false}, // 0b001
+        {false,true, true, false,false,false}, // 0b010
+        {false,true, false,false,true, false}, // 0b011
+        {true, false,false,false,false,true}, // 0b100
+        {true, false,false,true, false,false}, // 0b101
+        {false,false,true, false,false,true}, // 0b110
 };
 
 enum rotationSens_t {
@@ -56,10 +63,8 @@ public:
 
     ~BrushlessEirbot();
 
-    void init();
-
-    void setPI(float Kp, float wi, std::chrono::microseconds Te = 10ms);
-    void setPID(float Kp, float wi, float wb, float wh, std::chrono::microseconds TeUsController = 10ms);
+    void setPI(float Kp, float wi, ::chrono::microseconds Te = 10ms);
+    void setPID(float Kp, float wi, float wb, float wh, ::chrono::microseconds TeUsController = 10ms);
 
     void setVelocity(unitVelocity unit, float consigne);
     void setDutyCycle(float dutyCycle);
@@ -72,11 +77,20 @@ private:
     position _positionMotor;
     float _wheelDiameterMm;
     rotationSens_t _sens;
-    int32_t _ticks;
+    volatile int32_t _ticks;
     BufferedSerial *_serial;
     bool _debug{false};
     std::string buffer;
     char cbuffer[20]{0};
+    const halfBridge_t halfBridgeZEROS = {0,0,0,0,0,0};
+
+    TIM_TypeDef* _tim;
+    volatile uint8_t _hallWord_previous;
+
+    const float deltaTheta = 2*M_PI/(TickPerRevolution*Reductor);
+
+
+    void halfBridgeApply(halfBridge_t halfBridgeConfig);
 
     PinName _pinHall_1;
     PinName _pinHall_2;
@@ -95,7 +109,7 @@ private:
     AnalogIn *Current_B;
     AnalogIn *Current_C;
 
-    Controller* controller;
+    Controller* controller = nullptr; //FIXME mettre un correcteur par défaut
 
     std::chrono::microseconds TeUsController = 10ms;
     Ticker _tickerController;
@@ -104,4 +118,4 @@ private:
 };
 
 
-#endif
+#endif //BRUSHLESS_BASE_ROULANTE_BRUSHLESSEIRBOT_H
