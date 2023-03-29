@@ -6,6 +6,7 @@ BUILD/*
 .mbed
 projectfiles
 *.py*
+mbed-os
 mbed-os/*
 
 .idea/
