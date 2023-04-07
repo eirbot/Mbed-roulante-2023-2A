@@ -1,43 +1,85 @@
 #include "SerialPlot.hpp"
 
-SerialPlot::SerialPlot(BufferedSerial *pc, uint8_t number_variables, std::chrono::microseconds time_sample) {
+/* ************************************************
+ *             Contructors & Destructor
+ * ************************************************/
+SerialPlot::SerialPlot(BufferedSerial *pc, EventFlags* flag) {
     _pc = pc;
-    _number_variables = number_variables;
-    _timeSample = time_sample;
-    for (uint8_t i=0 ; i<20 ; i++) { buffer[i] = 0; }
-    std::string s;
-    for (uint8_t i=0 ; i<number_variables-1 ; i++){
-        s.append("%f,");
-    }
-    s.append("%f\n");
-    _format = new char[s.length()];
-    _format = s.c_str();
-
-//    std::string s = "Constructeur\n";
-//    _pc->write(s.c_str(), s.length());
+    setFlag(flag);
 }
+
+
+SerialPlot::SerialPlot(BufferedSerial *pc) : SerialPlot(pc, nullptr){
+
+}
+
+
 
 SerialPlot::~SerialPlot() {
-    debug_ticker.detach();
     debug_thread.terminate();
-    delete[] _format;
-    delete[] _variables;
+    for (uint8_t i = 0; i < floatVariables.size(); i++) {
+        delete floatVariables[i];
+        floatVariables[i] = 0;
+    }
+    for (uint8_t i = 0; i < uint16_tVariables.size(); i++) {
+        delete uint16_tVariables[i];
+        uint16_tVariables[i] = 0;
+    }
+    for (uint8_t i = 0; i < intVariables.size(); i++) {
+        delete intVariables[i];
+        intVariables[i] = 0;
+    }
+    delete _flag;
 }
+
+/* ************************************************
+ *                  Public Methods
+ * ************************************************/
 
 void SerialPlot::run() {
     debug_thread.start(callback(this, &SerialPlot::threadWorker));
 }
 
-void SerialPlot::tickerWorker() {
-    for (uint8_t i = 0 ; i<_number_variables ; i++) {
-        sprintf(buffer, _format, *_variables[i]);
-        _pc->write(buffer, sizeof(buffer));
+/* ************************************************
+ *                  Private Methods
+ * ************************************************/
+
+void SerialPlot::Worker() {
+    std::string str;
+    for (uint8_t i = 0; i < (floatVariables.size() - 1) ; i++) {
+        str.append(to_string(*floatVariables[i]));
+        str.append(",");
     }
+    str.append(to_string(*floatVariables[floatVariables.size() - 1]));
+    str.append("\n");
+    _pc->write(str.c_str(), str.length());
 }
 
 void SerialPlot::threadWorker() {
-    debug_ticker.attach(callback(this, &SerialPlot::tickerWorker), _timeSample);
-
-//    std::string s = "Ticker attaché\n";
-//    _pc->write(s.c_str(), s.length());
+    while (true){
+        _flag->wait_any(_flag->get());
+        Worker();
+    }
 }
+
+void SerialPlot::addVariables(int *ptrVariable) {
+    intVariables.push_back(ptrVariable);
+}
+
+void SerialPlot::addVariables(uint16_t *ptrVariable) {
+    uint16_tVariables.push_back(ptrVariable);
+}
+
+void SerialPlot::addVariables(float *ptrVariable) {
+    floatVariables.push_back(ptrVariable);
+}
+
+void SerialPlot::setTimeSample(const chrono::microseconds &timeSample) {
+    _timeSample = timeSample;
+}
+
+void SerialPlot::setFlag(EventFlags *flag) {
+    _flag = flag;
+}
+
+

@@ -1,26 +1,83 @@
 #ifndef MBED_SERIALPLOT_HPP
 #define MBED_SERIALPLOT_HPP
 
+#include <vector>
 #include "mbed.h"
+
+#define FlagDebug 0x0A
 
 class SerialPlot {
 public:
-    SerialPlot(BufferedSerial* pc, uint8_t number_variables, std::chrono::microseconds timeSample = 10ms);
-    void run();
+    explicit SerialPlot(BufferedSerial *pc);
+
+    SerialPlot(BufferedSerial *pc, EventFlags *flag);
 
     ~SerialPlot();
 
+    void setFlag(EventFlags *flag);
+
+    void setTimeSample(const chrono::microseconds &timeSample);
+/**
+ * Ajout du pointeur vers la variables de type `int` à la liste de variable à afficher.
+ * @param ptrVariable : float *
+ */
+    void addVariables(float *ptrVariable);
+/**
+ * Ajout du pointeur vers la variables de type `int` à la liste de variable à afficher.
+ * @param ptrVariable : uint16_t *
+ */
+    void addVariables(uint16_t *ptrVariable);
+/**
+ * Ajout du pointeur vers la variables de type `int` à la liste de variable à afficher.
+ * @param ptrVariable : int *
+ */
+    void addVariables(int *ptrVariable);
+    /**
+     * Méthode lançant le thread de Communication dit thread de débogage
+     */
+    void run();
+
+
 private:
-    Ticker debug_ticker;
-    char buffer[20]; // peu être améliorer
-    const char * _format;
-    void tickerWorker();
-    Thread debug_thread;
+/**
+ * Port série à utiliser pour le débogage
+ */
     BufferedSerial *_pc;
-    std::chrono::microseconds _timeSample = 10ms;
+
+    /**
+     * Flag permettant le cadencement de l'affichage.
+     * La fonction `Worker()` fonctionne dès que le flag est levé.
+     */
+    EventFlags *_flag;
+
+    /**
+     * Méthode privée permettant l'affichage des valeurs des pointeurs contenu dans les listes de variables.
+     * En commençant par les flottantes, puis les int et enfin les uint16_t
+     */
+    void Worker();
+
+    /**
+     * Thread de Communication utilisé pour le débogage par la communication série
+     */
+    Thread debug_thread;
+
+    /**
+     * Fonction d'éxécution du thread, fait fonctionner `Worker()` au rythme du flag
+     */
     void threadWorker();
-    uint8_t _number_variables;
-    static double** _variables; // tableau de pointeur vers des doubles déclarer dans le main
+
+    /**
+     * Listes des pointeur vers les variables flottantes
+     */
+    vector<float *> floatVariables;
+    /**
+     * Listes des pointeur vers les variables uint16_t (entière non signée)
+     */
+    vector<uint16_t *> uint16_tVariables;
+    /**
+     * Listes des pointeur vers les variables entière singnée
+     */
+    vector<int *> intVariables;
 };
 
 
