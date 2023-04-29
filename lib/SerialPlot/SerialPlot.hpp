@@ -8,30 +8,17 @@
 
 class SerialPlot {
 public:
-    explicit SerialPlot(BufferedSerial *pc);
-
     SerialPlot(BufferedSerial *pc, EventFlags *flag);
 
     ~SerialPlot();
 
-    void setFlag(EventFlags *flag);
-
-    void setTimeSample(const chrono::microseconds &timeSample);
 /**
  * Ajout du pointeur vers la variables de type `int` à la liste de variable à afficher.
  * @param ptrVariable : float *
  */
     void addVariables(float *ptrVariable);
-/**
- * Ajout du pointeur vers la variables de type `int` à la liste de variable à afficher.
- * @param ptrVariable : uint16_t *
- */
-    void addVariables(uint16_t *ptrVariable);
-/**
- * Ajout du pointeur vers la variables de type `int` à la liste de variable à afficher.
- * @param ptrVariable : int *
- */
-    void addVariables(int *ptrVariable);
+
+
     /**
      * Méthode lançant le thread de Communication dit thread de débogage
      */
@@ -70,14 +57,6 @@ private:
      * Listes des pointeur vers les variables flottantes
      */
     vector<float *> floatVariables;
-    /**
-     * Listes des pointeur vers les variables uint16_t (entière non signée)
-     */
-    vector<uint16_t *> uint16_tVariables;
-    /**
-     * Listes des pointeur vers les variables entière singnée
-     */
-    vector<int *> intVariables;
 };
 
 

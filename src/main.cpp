@@ -6,8 +6,8 @@
 DigitalOut led(LED1);
 
 BufferedSerial pc(USBTX, USBRX, 115200);
-
-SerialPlot debugPlot(&pc);
+EventFlags flagDebug;
+SerialPlot debugPlot(&pc, &flagDebug);
 BrushlessEirbot motorL(&debugPlot, Left, 78);
 
 

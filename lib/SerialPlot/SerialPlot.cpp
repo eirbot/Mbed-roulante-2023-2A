@@ -5,31 +5,11 @@
  * ************************************************/
 SerialPlot::SerialPlot(BufferedSerial *pc, EventFlags* flag) {
     _pc = pc;
-    setFlag(flag);
+    _flag = flag;
 }
-
-
-SerialPlot::SerialPlot(BufferedSerial *pc) : SerialPlot(pc, nullptr){
-
-}
-
-
 
 SerialPlot::~SerialPlot() {
     debug_thread.terminate();
-    for (uint8_t i = 0; i < floatVariables.size(); i++) {
-        delete floatVariables[i];
-        floatVariables[i] = 0;
-    }
-    for (uint8_t i = 0; i < uint16_tVariables.size(); i++) {
-        delete uint16_tVariables[i];
-        uint16_tVariables[i] = 0;
-    }
-    for (uint8_t i = 0; i < intVariables.size(); i++) {
-        delete intVariables[i];
-        intVariables[i] = 0;
-    }
-    delete _flag;
 }
 
 /* ************************************************
@@ -62,24 +42,8 @@ void SerialPlot::threadWorker() {
     }
 }
 
-void SerialPlot::addVariables(int *ptrVariable) {
-    intVariables.push_back(ptrVariable);
-}
-
-void SerialPlot::addVariables(uint16_t *ptrVariable) {
-    uint16_tVariables.push_back(ptrVariable);
-}
-
 void SerialPlot::addVariables(float *ptrVariable) {
     floatVariables.push_back(ptrVariable);
-}
-
-void SerialPlot::setTimeSample(const chrono::microseconds &timeSample) {
-    _timeSample = timeSample;
-}
-
-void SerialPlot::setFlag(EventFlags *flag) {
-    _flag = flag;
 }
 
 
