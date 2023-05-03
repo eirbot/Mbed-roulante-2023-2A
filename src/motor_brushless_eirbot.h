@@ -11,6 +11,7 @@
 
 #include "mbed.h"
 #include "motor/motor_DC.h"
+//#include "motor_sensor_hall.h"
 
 namespace sixtron {
 
@@ -50,10 +51,12 @@ namespace sixtron {
     class MotorBrushlessEirbot: public MotorDC {
 
     public:
-		MotorBrushlessEirbot(float rate_dt, position motor_position,
-                PID_params motor_pid,
-                float max_pwm = DEFAULT_MOTOR_MAX_PWM):
-                MotorDC(rate_dt, motor_pid, max_pwm), _positionMotor(motor_position) {};
+		MotorBrushlessEirbot(float rate_dt,
+							 position motor_position,
+							 PID_params motor_pid,
+							 float max_pwm = DEFAULT_MOTOR_MAX_PWM):
+							 MotorDC(rate_dt, motor_pid, max_pwm),
+							 _positionMotor(motor_position), _updateRate_dt(rate_dt) {};
 
 		void setSpeed(float speed_ms) override;
 
@@ -64,7 +67,20 @@ namespace sixtron {
 		int32_t getHALLticks();
 
     private:
-        TIM_TypeDef *_tim;
+		inline float ticks2Meters(float ticks) const
+		{
+			return (ticks * (1.0f / _tickPerMeters));
+		}
+		float _wheelPerimeter, _tickPerMeters;
+		float _motorResolution, _motorWheelRadius;
+		float _updateRate_dt = 0.0f;
+//		int64_t _sensorResolution = 0;
+//		int64_t _sensorDirection = 0;
+
+		int64_t _sensorTickCount = 0;
+		int64_t _sensorTickCountOld = 0;
+
+		TIM_TypeDef *_tim;
         position _positionMotor;
         rotationSens_t _sens;
         InterruptIn *HALL_1;

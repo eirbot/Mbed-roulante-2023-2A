@@ -11,7 +11,6 @@ DigitalOut led(LED1);
 //SerialPlot debugPlot(&pc, &flagDebug);
 //BrushlessEirbot motorL(&debugPlot, Left, 78);
 
-
 // Motor MBED config
 #define MOTOR_UPDATE_RATE 10ms
 #define MOTOR_FLAG 0x01
@@ -40,10 +39,10 @@ void motorThreadMain()
     pid_motor_params.dt_seconds = dt_pid;
     //pid_motor_params.ramp = 1.0f * dt_pid;
 
-    motor_left = new sixtron::MotorBrushlessEirbot(
-            dt_pid, sixtron::position::left, pid_motor_params, 0.6f);
+	motor_left = new sixtron::MotorBrushlessEirbot(
+			dt_pid, sixtron::position::left, pid_motor_params, 0.6f);
 
-    // Init motor (will init sensor as well)
+    // Init motor and sensor
     motor_left->init();
     motor_init_done = true;
 
@@ -51,8 +50,10 @@ void motorThreadMain()
         // wait for the flag trigger
         MotorFlag.wait_any(MOTOR_FLAG);
 
-        // Update motor
-//        motor_left->update();
+        // Update sensor motor
+        motor_left->update();
+
+		printf("speed=%2.4f\n",motor_left->getSpeed());
     }
 }
 
@@ -73,8 +74,7 @@ int main()
     MotorUpdateTicker.attach(&MotorFlagUpdate, MOTOR_UPDATE_RATE);
 
     printf("Waiting for the motor to be setup ...\n");
-    while (!motor_init_done)
-        ;
+    while (!motor_init_done);
     printf("Motor init done, continue with setting targets.\n");
 
     while (true) {
