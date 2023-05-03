@@ -15,7 +15,7 @@
 namespace sixtron {
 
     enum position {
-        Left, Right
+        left, right
     };
     enum rotationSens_t {
         clockwise, antiClockwise
@@ -55,7 +55,9 @@ namespace sixtron {
                 float max_pwm = DEFAULT_MOTOR_MAX_PWM):
                 MotorDC(rate_dt, motor_pid, max_pwm), _positionMotor(motor_position) {};
 
-    private:
+		void setSpeed(float speed_ms) override;
+
+    public:
         void initHardware() override;
         void setPWM(float pwm) override;
         float getSensorSpeed() override;
@@ -76,6 +78,7 @@ namespace sixtron {
         PinName _pinHall_1;
         PinName _pinHall_2;
         PinName _pinHall_3;
+		bool force_hall_update;
     };
 
 }; // namespace sixtron

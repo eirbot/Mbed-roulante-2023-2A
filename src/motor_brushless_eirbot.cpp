@@ -38,8 +38,10 @@ void TIMER8_init() {
 namespace sixtron {
 
     void MotorBrushlessEirbot::initHardware() {
+		force_hall_update = true;
+
         // Init Motor PWM
-        if (_positionMotor == Left) {
+        if (_positionMotor == left) {
             // Configuration des Hall Sensors
             _pinHall_1 = PB_2;
             _pinHall_2 = PB_5;
@@ -47,7 +49,7 @@ namespace sixtron {
             _tim = TIM1;
             TIMER1_init();
         }
-        else if (_positionMotor == Right) {
+        else if (_positionMotor == right) {
             _pinHall_1 = PB_7;
             _pinHall_2 = PB_8;
             _pinHall_3 = PB_9;
@@ -72,7 +74,14 @@ namespace sixtron {
         return 14*48;
     }
 
-    void MotorBrushlessEirbot::setPWM(float pwm) {
+	void MotorBrushlessEirbot::setSpeed(float speed_ms)
+	{
+		_targetSpeed = speed_ms;
+		force_hall_update = true;
+	}
+
+
+	void MotorBrushlessEirbot::setPWM(float pwm) {
         // update hardware motor PWM
 
         if (pwm >= 0) { _sens = clockwise; }
@@ -87,6 +96,12 @@ namespace sixtron {
         _tim->CCR1 = dutyCycle_int;
         _tim->CCR2 = dutyCycle_int;
         _tim->CCR3 = dutyCycle_int;
+
+		if(force_hall_update){
+			hallInterrupt();
+			force_hall_update = false;
+		}
+
     }
 
     int32_t MotorBrushlessEirbot::getHALLticks() {
