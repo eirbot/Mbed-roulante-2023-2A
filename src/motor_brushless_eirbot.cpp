@@ -58,12 +58,15 @@ namespace sixtron {
 
         halfBridgeApply(halfBridgeZEROS);
 
-        HALL_1 = new InterruptIn(_pinHall_1, PullNone);
-        HALL_2 = new InterruptIn(_pinHall_2, PullNone);
-        HALL_3 = new InterruptIn(_pinHall_3, PullNone);
+        HALL_1 = new InterruptIn(_pinHall_1, PullDown);
+        HALL_2 = new InterruptIn(_pinHall_2, PullDown);
+        HALL_3 = new InterruptIn(_pinHall_3, PullDown);
         HALL_1->rise(callback(this, &MotorBrushlessEirbot::hallInterrupt));
         HALL_2->rise(callback(this, &MotorBrushlessEirbot::hallInterrupt));
         HALL_3->rise(callback(this, &MotorBrushlessEirbot::hallInterrupt));
+        HALL_1->fall(callback(this, &MotorBrushlessEirbot::hallInterrupt));
+        HALL_2->fall(callback(this, &MotorBrushlessEirbot::hallInterrupt));
+        HALL_3->fall(callback(this, &MotorBrushlessEirbot::hallInterrupt));
     }
 
     float MotorBrushlessEirbot::getSensorSpeed() {
@@ -80,12 +83,18 @@ namespace sixtron {
     void MotorBrushlessEirbot::setPWM(float pwm) {
         // update hardware motor PWM
 
+        if (force_hall_update) {
+            hallInterrupt();
+            force_hall_update = false;
+        }
+
         if (pwm > 0.001f) {
             _sens = clockwise;
         } else if (pwm < -0.001f) {
             _sens = antiClockwise;
         } else{
             _sens = none;
+            force_hall_update = true;
         }
 
         // Conversion vers uint8_t
@@ -98,14 +107,9 @@ namespace sixtron {
         _tim->CCR2 = dutyCycle_int;
         _tim->CCR3 = dutyCycle_int;
 
-
-        if (force_hall_update) {
-            hallInterrupt();
-            force_hall_update = false;
-        }
-
     }
 
+    // @deprecated
     int32_t MotorBrushlessEirbot::getHALLticks() {
         return _hall_ticks;
     }
@@ -126,7 +130,7 @@ namespace sixtron {
 
         sector = getSector(hallWord);
         if (sector == -1) {
-//            _hall_ticks = 42;
+            _hall_ticks = 42;
             return; // ne devrait jamais arriver ... sinon problème de câbles HALL
         }
 
@@ -157,6 +161,7 @@ namespace sixtron {
             halfBridge = antiClockwiseSequence[hallWord - 1];
         } else {
             halfBridge = halfBridgeZEROS;
+            force_hall_update = true; // because motor pas bougé donc hall pas se mettre à jour tout seul
         }
 
         halfBridgeApply(halfBridge);

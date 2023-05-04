@@ -72,9 +72,10 @@ void motorThreadMain() {
 
         if(show_printf>5){
             show_printf = 0;
-            printf("speed target=%01.3f %01.3f\n",
+            printf("speed target=%01.3f %01.3f (ticks=%06ld)\n",
                    target_ms,
-                   motor_left->getSpeed());
+                   motor_left->getSpeed(),
+                   motor_left->getHALLticks());
         }
     }
 }
@@ -100,10 +101,10 @@ int main() {
 
     while (true) {
 
-        set_motor_target(0.4f);
+        set_motor_target(-0.4f);
         ThisThread::sleep_for(4s);
 
-        set_motor_target(0.6f);
+        set_motor_target(-0.6f);
         ThisThread::sleep_for(4s);
 
         set_motor_target(0.0f);
