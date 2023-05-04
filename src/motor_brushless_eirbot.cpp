@@ -38,7 +38,7 @@ namespace sixtron {
     void MotorBrushlessEirbot::initHardware() {
         force_hall_update = true;
 
-        _sensor_hall.init();
+//        _sensor_hall.init();
 
         // Init Motor PWM
         if (_positionMotor == left) {
@@ -56,7 +56,7 @@ namespace sixtron {
             TIMER8_init();
         }
 
-        _hallWord_previous = 0b000;
+//        _hallWord_previous = 0b000;
         halfBridgeApply(halfBridgeZEROS);
 
         HALL_1 = new InterruptIn(_pinHall_1, PullNone);
@@ -68,8 +68,9 @@ namespace sixtron {
     }
 
     float MotorBrushlessEirbot::getSensorSpeed() {
-        _sensor_hall.update();
-        return _sensor_hall.getSpeed();
+//        _sensor_hall.update();
+//        return _sensor_hall.getSpeed();
+return 42;
 
     }
 
@@ -103,27 +104,58 @@ namespace sixtron {
 
     }
 
-//    int32_t MotorBrushlessEirbot::getHALLticks() {
-//        return _hall_ticks;
-//    }
+    int32_t MotorBrushlessEirbot::getHALLticks() {
+        return _hall_ticks;
+    }
+
+    static inline int getSector(uint8_t hallWord) {
+        static const unsigned int hall_to_phase[6] = { 0, 2, 1, 4, 5, 3 };
+
+        if ((hallWord >= 1) && (hallWord <= 6)) { // hall value ok
+            return hall_to_phase[hallWord - 1];
+        } else { // not a valid value
+            return -1;
+        }
+    }
+
+    void MotorBrushlessEirbot::updateTicks(uint8_t hallWord) {
+        static int old_sector = 0;
+        int delta, sector;
+
+        sector = getSector(hallWord);
+        if(sector == -1){
+//            _hall_ticks = 42;
+            return; // ne devrait jamais arriver ...
+        }
+
+        delta = sector - old_sector;
+        old_sector = sector;
+
+        if (delta <= -3) {
+            _hall_ticks += delta + 6;
+        } else if (delta >= 3) {
+            _hall_ticks += delta - 6;
+        } else {
+            _hall_ticks += delta;
+        }
+    }
 
     void MotorBrushlessEirbot::hallInterrupt() {
         // Lecture Hall sensors
-        volatile uint8_t hallWord = (HALL_1->read() << 2) | (HALL_2->read() << 1) | HALL_3->read();
+        uint8_t hallWord = (HALL_1->read() << 2) | (HALL_2->read() << 1) | HALL_3->read();
+
+        // Mis à jours des ticks en fonction du secteur des halls
+        updateTicks(hallWord);
 
         // Affectation de la séquence d'après
         halfBridge_t halfBridge = {false, false, false, false, false, false};
         if (_sens == clockwise) {
             halfBridge = clockwiseSequence[hallWord - 1];
-            _hall_ticks++; // Indentation des ticks
         } else if (_sens == antiClockwise) {
             halfBridge = antiClockwiseSequence[hallWord - 1];
-            _hall_ticks--; // Indentation des ticks
         }
 
         halfBridgeApply(halfBridge);
-
-        _hallWord_previous = hallWord; // Retenir la valeur précédente
     }
 
     void MotorBrushlessEirbot::halfBridgeApply(halfBridge_t halfBridgeConfig) {
@@ -165,7 +197,7 @@ namespace sixtron {
         }
     }
 
-    MotorSensorHall *MotorBrushlessEirbot::getSensorObj() {
-        return &_sensor_hall;
-    }
+//    MotorSensorHall *MotorBrushlessEirbot::getSensorObj() {
+//        return &_sensor_hall;
+//    }
 } // namespace sixtron
