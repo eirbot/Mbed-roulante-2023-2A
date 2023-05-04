@@ -38,6 +38,8 @@ namespace sixtron {
     void MotorBrushlessEirbot::initHardware() {
         force_hall_update = true;
 
+        _sensor_hall.init();
+
         // Init Motor PWM
         if (_positionMotor == left) {
             // Configuration des Hall Sensors
@@ -66,8 +68,8 @@ namespace sixtron {
     }
 
     float MotorBrushlessEirbot::getSensorSpeed() {
-
-        return 14 * 48;
+        _sensor_hall.update();
+        return _sensor_hall.getSpeed();
 
     }
 
@@ -101,9 +103,9 @@ namespace sixtron {
 
     }
 
-    int32_t MotorBrushlessEirbot::getHALLticks() {
-        return _ticks;
-    }
+//    int32_t MotorBrushlessEirbot::getHALLticks() {
+//        return _hall_ticks;
+//    }
 
     void MotorBrushlessEirbot::hallInterrupt() {
         // Lecture Hall sensors
@@ -113,10 +115,10 @@ namespace sixtron {
         halfBridge_t halfBridge = {false, false, false, false, false, false};
         if (_sens == clockwise) {
             halfBridge = clockwiseSequence[hallWord - 1];
-            _ticks++; // Indentation des ticks
+            _hall_ticks++; // Indentation des ticks
         } else if (_sens == antiClockwise) {
             halfBridge = antiClockwiseSequence[hallWord - 1];
-            _ticks--; // Indentation des ticks
+            _hall_ticks--; // Indentation des ticks
         }
 
         halfBridgeApply(halfBridge);
@@ -161,5 +163,9 @@ namespace sixtron {
         } else {
             _tim->CCER &= ~(TIM_CCER_CC3NE);
         }
+    }
+
+    MotorSensorHall *MotorBrushlessEirbot::getSensorObj() {
+        return &_sensor_hall;
     }
 } // namespace sixtron

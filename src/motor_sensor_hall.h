@@ -11,7 +11,6 @@
 
 #include "mbed.h"
 #include "motor_sensor_encoder.h"
-//#include "motor_brushless_eirbot.h"
 
 namespace sixtron {
 
@@ -21,14 +20,13 @@ namespace sixtron {
     class MotorSensorHall : public MotorSensorEncoder {
     public:
         MotorSensorHall(float rate_dt,
-//					MotorBrushlessEirbot* motor,
+                        volatile uint16_t *hall_ticks,
                         int32_t sensorResolution,
                         float motorResolution,
                         float motorWheelRadius,
                         int encDirection = DIR_NORMAL) :
-                MotorSensorEncoder(rate_dt, sensorResolution, motorResolution, motorWheelRadius, encDirection)
-//					_motor(motor)
-        {};
+                MotorSensorEncoder(rate_dt, sensorResolution, motorResolution, motorWheelRadius, encDirection),
+                _motor_hall_ticks(hall_ticks) {};
 
     protected:
         void initSensor() override;
@@ -36,7 +34,9 @@ namespace sixtron {
         uint16_t getSensorValue() override;
 
     private:
-//	MotorBrushlessEirbot *_motor;
+
+        volatile uint16_t *_motor_hall_ticks;
+
     };
 
 } // namespace sixtron

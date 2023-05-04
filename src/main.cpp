@@ -12,9 +12,14 @@ DigitalOut led(LED1);
 //SerialPlot debugPlot(&pc, &flagDebug);
 //BrushlessEirbot motorL(&debugPlot, Left, 78);
 
-// Motor MBED config
+// Motor MBED and HALL sensorconfig
 #define MOTOR_UPDATE_RATE 10ms
 #define MOTOR_FLAG 0x01
+#define ENC_HALL_RESOLUTION 65536 //because uint16_t
+#define MOTOR_RESOLUTION 48
+#define MOTOR_REDUCTION 14
+#define WHEEL_RESOLUTION (MOTOR_RESOLUTION*MOTOR_REDUCTION)
+#define WHEEL_RADIUS (0.078f/2.0f)
 Ticker MotorUpdateTicker;
 EventFlags MotorFlag;
 Thread motorThread(osPriorityNormal);
@@ -39,7 +44,12 @@ void motorThreadMain() {
     //pid_motor_params.ramp = 1.0f * dt_pid;
 
     motor_left = new sixtron::MotorBrushlessEirbot(
-            dt_pid, sixtron::position::left, pid_motor_params, 0.6f);
+            dt_pid, sixtron::position::left, pid_motor_params,
+            ENC_HALL_RESOLUTION,
+            WHEEL_RESOLUTION,
+            WHEEL_RADIUS,
+            DIR_NORMAL,
+            0.6f);
 
     // Init motor and sensor
     motor_left->init();
@@ -50,9 +60,9 @@ void motorThreadMain() {
         MotorFlag.wait_any(MOTOR_FLAG);
 
         // Update sensor motor
-        motor_left->update();
+//        motor_left->update();
 
-        printf("speed=%2.4f\n", motor_left->getSpeed());
+        printf("speed M:%2.4f S:%2.4f\n", motor_left->getSpeed(), motor_left->getSensorObj()->getSpeed());
     }
 }
 
