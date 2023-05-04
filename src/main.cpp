@@ -3,6 +3,7 @@
 //#include "BrushlessEirbot.hpp"
 //#include "SerialPlot.hpp"
 #include "motor_brushless_eirbot.h"
+
 // ============= DEFINITIONS =================
 DigitalOut led(LED1);
 
@@ -17,16 +18,14 @@ DigitalOut led(LED1);
 Ticker MotorUpdateTicker;
 EventFlags MotorFlag;
 Thread motorThread(osPriorityNormal);
-sixtron::MotorBrushlessEirbot* motor_left;
+sixtron::MotorBrushlessEirbot *motor_left;
 bool motor_init_done = false;
 
-void MotorFlagUpdate()
-{
+void MotorFlagUpdate() {
     MotorFlag.set(MOTOR_FLAG);
 }
 
-void motorThreadMain()
-{
+void motorThreadMain() {
     // First, convert the rate of the loop in seconds [float]
     auto f_secs = std::chrono::duration_cast<std::chrono::duration<float>>(MOTOR_UPDATE_RATE);
     float dt_pid = f_secs.count();
@@ -39,8 +38,8 @@ void motorThreadMain()
     pid_motor_params.dt_seconds = dt_pid;
     //pid_motor_params.ramp = 1.0f * dt_pid;
 
-	motor_left = new sixtron::MotorBrushlessEirbot(
-			dt_pid, sixtron::position::left, pid_motor_params, 0.6f);
+    motor_left = new sixtron::MotorBrushlessEirbot(
+            dt_pid, sixtron::position::left, pid_motor_params, 0.6f);
 
     // Init motor and sensor
     motor_left->init();
@@ -53,20 +52,18 @@ void motorThreadMain()
         // Update sensor motor
         motor_left->update();
 
-		printf("speed=%2.4f\n",motor_left->getSpeed());
+        printf("speed=%2.4f\n", motor_left->getSpeed());
     }
 }
 
 // Just for the debug
-void set_motor_target(float speed_ms)
-{
+void set_motor_target(float speed_ms) {
     printf("Applying %2.3f m/s to the motor.\n", speed_ms);
     //motor_right->setSpeed(speed_ms);
-	motor_left->setPWM(speed_ms);
+    motor_left->setPWM(speed_ms);
 }
 
-int main()
-{
+int main() {
     // Start the thread for motor control
     motorThread.start(motorThreadMain);
 

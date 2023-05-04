@@ -11,7 +11,7 @@
 
 #include "mbed.h"
 #include "motor/motor_DC.h"
-//#include "motor_sensor_hall.h"
+#include "motor_sensor_hall.h"
 
 namespace sixtron {
 
@@ -48,53 +48,46 @@ namespace sixtron {
 
 #define DEFAULT_MOTOR_MAX_PWM 1.0f // max PWM with mbed is 1.0f
 
-    class MotorBrushlessEirbot: public MotorDC {
+    class MotorBrushlessEirbot : public MotorDC {
 
     public:
-		MotorBrushlessEirbot(float rate_dt,
-							 position motor_position,
-							 PID_params motor_pid,
-							 float max_pwm = DEFAULT_MOTOR_MAX_PWM):
-							 MotorDC(rate_dt, motor_pid, max_pwm),
-							 _positionMotor(motor_position), _updateRate_dt(rate_dt) {};
+        MotorBrushlessEirbot(float rate_dt,
+                             position motor_position,
+                             PID_params motor_pid,
+                             float max_pwm = DEFAULT_MOTOR_MAX_PWM) :
+                MotorDC(rate_dt, motor_pid, max_pwm),
+                _positionMotor(motor_position) {};
 
-		void setSpeed(float speed_ms) override;
+        void setSpeed(float speed_ms) override;
 
     public:
         void initHardware() override;
+
         void setPWM(float pwm) override;
+
         float getSensorSpeed() override;
-		int32_t getHALLticks();
+
+        int32_t getHALLticks();
 
     private:
-		inline float ticks2Meters(float ticks) const
-		{
-			return (ticks * (1.0f / _tickPerMeters));
-		}
-		float _wheelPerimeter, _tickPerMeters;
-		float _motorResolution, _motorWheelRadius;
-		float _updateRate_dt = 0.0f;
-//		int64_t _sensorResolution = 0;
-//		int64_t _sensorDirection = 0;
-
-		int64_t _sensorTickCount = 0;
-		int64_t _sensorTickCountOld = 0;
-
-		TIM_TypeDef *_tim;
+        TIM_TypeDef *_tim;
         position _positionMotor;
         rotationSens_t _sens;
         InterruptIn *HALL_1;
         InterruptIn *HALL_2;
         InterruptIn *HALL_3;
+
         void hallInterrupt();
+
         void halfBridgeApply(halfBridge_t halfBridgeConfig);
+
         const halfBridge_t halfBridgeZEROS = {0, 0, 0, 0, 0, 0};
         volatile uint8_t _hallWord_previous;
         volatile int32_t _ticks;
         PinName _pinHall_1;
         PinName _pinHall_2;
         PinName _pinHall_3;
-		bool force_hall_update;
+        bool force_hall_update;
     };
 
 }; // namespace sixtron

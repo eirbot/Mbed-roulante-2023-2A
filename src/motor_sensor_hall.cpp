@@ -10,14 +10,13 @@
 
 namespace sixtron {
 
-void MotorSensorHall::initSensor()
-{
-	// Nothing to init ...
-}
+    void MotorSensorHall::initSensor() {
+        // Nothing to init ...
+    }
 
-uint16_t MotorSensorHall::getSensorValue()
-{
-	return _motor->getHALLticks();
-}
+    uint16_t MotorSensorHall::getSensorValue() {
+//	return _motor->getHALLticks();
+        return 0;
+    }
 
 } // namespace sixtron
