@@ -57,11 +57,12 @@ namespace sixtron {
                              int32_t sensorResolution,
                              float motorResolution,
                              float motorWheelRadius,
-                             int encDirection = DIR_NORMAL,
+                             int motorDir = DIR_NORMAL,
                              float max_pwm = DEFAULT_MOTOR_MAX_PWM) :
                 MotorDC(rate_dt, motor_pid, max_pwm),
-                _sensor_hall(rate_dt, &_hall_ticks, sensorResolution, motorResolution, motorWheelRadius, encDirection),
-                _positionMotor(motor_position) {};
+                _sensor_hall(rate_dt, &_hall_ticks, sensorResolution, motorResolution, motorWheelRadius, DIR_NORMAL),
+                _motorDir(motorDir),
+                _positionMotor(motor_position){};
 
         void setSpeed(float speed_ms) override;
 
@@ -82,6 +83,8 @@ namespace sixtron {
 
         MotorSensorHall _sensor_hall;
 
+        int _motorDir;
+
 		void updateTicks(uint8_t hallWord);
 
         TIM_TypeDef *_tim;
@@ -95,7 +98,7 @@ namespace sixtron {
 
         void halfBridgeApply(halfBridge_t halfBridgeConfig);
 
-        const halfBridge_t halfBridgeZEROS = {0, 0, 0, 0, 0, 0};
+        const halfBridge_t halfBridgeZEROS = {false, false, false, false, false, false};
         volatile uint16_t _hall_ticks;
         PinName _pinHall_1;
         PinName _pinHall_2;

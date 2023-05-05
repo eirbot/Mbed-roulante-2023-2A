@@ -20,10 +20,12 @@ DigitalOut led(LED1);
 #define MOTOR_REDUCTION 14
 #define WHEEL_RESOLUTION float(MOTOR_RESOLUTION*MOTOR_REDUCTION)
 #define WHEEL_RADIUS (0.078f/2.0f)
+#define MAX_PWM 0.6f
 Ticker MotorUpdateTicker;
 EventFlags MotorFlag;
 Thread motorThread(osPriorityNormal);
 sixtron::MotorBrushlessEirbot *motor_left;
+sixtron::MotorBrushlessEirbot *motor_right;
 bool motor_init_done = false;
 
 void MotorFlagUpdate() {
@@ -39,7 +41,7 @@ void motorThreadMain() {
     // Create a motor object
     sixtron::PID_params pid_motor_params;
     pid_motor_params.Kp = 6.0f;
-    pid_motor_params.Ki = 5.0f;
+    pid_motor_params.Ki = 10.0f;
     pid_motor_params.Kd = 0.0f;
     pid_motor_params.Kf = 2.0f;
     pid_motor_params.dt_seconds = dt_pid;
@@ -52,11 +54,22 @@ void motorThreadMain() {
             ENC_HALL_RESOLUTION,
             WHEEL_RESOLUTION,
             WHEEL_RADIUS,
+            DIR_INVERTED,
+            MAX_PWM);
+
+    motor_right = new sixtron::MotorBrushlessEirbot(
+            dt_pid,
+            sixtron::position::right,
+            pid_motor_params,
+            ENC_HALL_RESOLUTION,
+            WHEEL_RESOLUTION,
+            WHEEL_RADIUS,
             DIR_NORMAL,
-            0.5f);
+            MAX_PWM);
 
     // Init motor and sensor
     motor_left->init();
+    motor_right->init();
     ThisThread::sleep_for(500ms);
     motor_init_done = true;
 
@@ -67,18 +80,19 @@ void motorThreadMain() {
 
         // Update sensor motor
         motor_left->update();
+        motor_right->update();
 
         show_printf++;
 
-        if(show_printf>5){
-            show_printf = 0;
-            printf("speed target=%01.3f %01.3f (ticks=%06ld) (sector=%02d) (pwm=%01.3f)\n",
-                   target_ms,
-                   motor_left->getSpeed(),
-                   motor_left->getHALLticks(),
-                   motor_left->getLastSector(),
-                   motor_left->getLastPWM());
-        }
+//        if(show_printf>1){
+//            show_printf = 0;
+//            printf("speed target=%01.3f %01.3f (ticks=%06ld) (sector=%02d) (pwm=%01.3f)\n",
+//                   target_ms,
+//                   motor_left->getSpeed(),
+//                   motor_left->getHALLticks(),
+//                   motor_left->getLastSector(),
+//                   motor_left->getLastPWM());
+//        }
     }
 }
 
@@ -86,6 +100,7 @@ void motorThreadMain() {
 void set_motor_target(float speed_ms) {
 //    printf("Applying %2.3f m/s to the motor.\n", speed_ms);
     motor_left->setSpeed(speed_ms);
+    motor_right->setSpeed(speed_ms);
     target_ms = speed_ms;
 //    motor_left->setPWM(speed_ms);
 }
@@ -104,19 +119,19 @@ int main() {
     while (true) {
 
         set_motor_target(-0.4f);
-        ThisThread::sleep_for(4s);
+        ThisThread::sleep_for(2s);
 
         set_motor_target(-0.6f);
-        ThisThread::sleep_for(4s);
+        ThisThread::sleep_for(1s);
 
         set_motor_target(0.0f);
         ThisThread::sleep_for(1s);
 
         set_motor_target(0.4f);
-        ThisThread::sleep_for(4s);
+        ThisThread::sleep_for(2s);
 
         set_motor_target(0.6f);
-        ThisThread::sleep_for(4s);
+        ThisThread::sleep_for(1s);
 
         set_motor_target(0.0f);
         ThisThread::sleep_for(1s);

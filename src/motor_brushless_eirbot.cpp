@@ -64,9 +64,9 @@ namespace sixtron {
         HALL_1->rise(callback(this, &MotorBrushlessEirbot::hallInterrupt));
         HALL_2->rise(callback(this, &MotorBrushlessEirbot::hallInterrupt));
         HALL_3->rise(callback(this, &MotorBrushlessEirbot::hallInterrupt));
-        HALL_1->fall(callback(this, &MotorBrushlessEirbot::hallInterrupt));
-        HALL_2->fall(callback(this, &MotorBrushlessEirbot::hallInterrupt));
-        HALL_3->fall(callback(this, &MotorBrushlessEirbot::hallInterrupt));
+//        HALL_1->fall(callback(this, &MotorBrushlessEirbot::hallInterrupt));
+//        HALL_2->fall(callback(this, &MotorBrushlessEirbot::hallInterrupt));
+//        HALL_3->fall(callback(this, &MotorBrushlessEirbot::hallInterrupt));
     }
 
     float MotorBrushlessEirbot::getSensorSpeed() {
@@ -75,7 +75,10 @@ namespace sixtron {
     }
 
     void MotorBrushlessEirbot::setSpeed(float speed_ms) {
-        _targetSpeed = speed_ms;
+        if(_motorDir == DIR_NORMAL)
+            _targetSpeed = speed_ms;
+        else
+            _targetSpeed = -speed_ms;
         force_hall_update = true;
     }
 
@@ -99,7 +102,7 @@ namespace sixtron {
             _sens = antiClockwise;
         } else {
             _sens = none;
-            force_hall_update = true;
+//            force_hall_update = true;
         }
 
         // Conversion vers uint8_t
