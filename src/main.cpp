@@ -13,7 +13,7 @@ DigitalOut led(LED1);
 //BrushlessEirbot motorL(&debugPlot, Left, 78);
 
 // Motor MBED and HALL sensorconfig
-#define MOTOR_UPDATE_RATE 20ms //50Hz
+#define MOTOR_UPDATE_RATE 20ms // 20ms for 50Hz
 #define MOTOR_FLAG 0x01
 #define ENC_HALL_RESOLUTION 65536 // max uint16
 #define MOTOR_RESOLUTION 48
@@ -47,13 +47,13 @@ void motorThreadMain() {
 
     motor_left = new sixtron::MotorBrushlessEirbot(
             dt_pid,
-			sixtron::position::right,
+			sixtron::position::left,
 			pid_motor_params,
             ENC_HALL_RESOLUTION,
             WHEEL_RESOLUTION,
             WHEEL_RADIUS,
             DIR_NORMAL,
-            0.6f);
+            0.5f);
 
     // Init motor and sensor
     motor_left->init();
@@ -72,17 +72,19 @@ void motorThreadMain() {
 
         if(show_printf>5){
             show_printf = 0;
-            printf("speed target=%01.3f %01.3f (ticks=%06ld)\n",
+            printf("speed target=%01.3f %01.3f (ticks=%06ld) (sector=%02d) (pwm=%01.3f)\n",
                    target_ms,
                    motor_left->getSpeed(),
-                   motor_left->getHALLticks());
+                   motor_left->getHALLticks(),
+                   motor_left->getLastSector(),
+                   motor_left->getLastPWM());
         }
     }
 }
 
 // Just for the debug
 void set_motor_target(float speed_ms) {
-    printf("Applying %2.3f m/s to the motor.\n", speed_ms);
+//    printf("Applying %2.3f m/s to the motor.\n", speed_ms);
     motor_left->setSpeed(speed_ms);
     target_ms = speed_ms;
 //    motor_left->setPWM(speed_ms);
@@ -110,10 +112,10 @@ int main() {
         set_motor_target(0.0f);
         ThisThread::sleep_for(1s);
 
-        set_motor_target(-0.4f);
+        set_motor_target(0.4f);
         ThisThread::sleep_for(4s);
 
-        set_motor_target(-0.6f);
+        set_motor_target(0.6f);
         ThisThread::sleep_for(4s);
 
         set_motor_target(0.0f);

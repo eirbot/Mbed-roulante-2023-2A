@@ -30,7 +30,7 @@ namespace sixtron {
         bool cL;
     } halfBridge_t;
     const halfBridge_t clockwiseSequence[6] = { //  101 -> 001 -> 011 -> 010 -> 110 -> 100
-            {false, true,  false, false, true,  false}, // 0b001
+            {false, false,  true, false, false,  true}, // 0b001
             {true,  false, false, true,  false, false}, // 0b010
             {true,  false, false, false, false, true},  // 0b011
             {false, true,  false, false, true,  false}, // 0b100
@@ -73,6 +73,8 @@ namespace sixtron {
         float getSensorSpeed() override;
 
 		int32_t getHALLticks();
+        int getLastSector();
+        float getLastPWM();
 
         MotorSensorHall* getSensorObj();
 

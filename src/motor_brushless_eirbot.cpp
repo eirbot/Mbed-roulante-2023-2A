@@ -58,9 +58,9 @@ namespace sixtron {
 
         halfBridgeApply(halfBridgeZEROS);
 
-        HALL_1 = new InterruptIn(_pinHall_1, PullDown);
-        HALL_2 = new InterruptIn(_pinHall_2, PullDown);
-        HALL_3 = new InterruptIn(_pinHall_3, PullDown);
+        HALL_1 = new InterruptIn(_pinHall_1, PullNone);
+        HALL_2 = new InterruptIn(_pinHall_2, PullNone);
+        HALL_3 = new InterruptIn(_pinHall_3, PullNone);
         HALL_1->rise(callback(this, &MotorBrushlessEirbot::hallInterrupt));
         HALL_2->rise(callback(this, &MotorBrushlessEirbot::hallInterrupt));
         HALL_3->rise(callback(this, &MotorBrushlessEirbot::hallInterrupt));
@@ -79,9 +79,14 @@ namespace sixtron {
         force_hall_update = true;
     }
 
+    float last_pwm = 0.0f;
+    float MotorBrushlessEirbot::getLastPWM(){
+        return last_pwm;
+    }
 
     void MotorBrushlessEirbot::setPWM(float pwm) {
         // update hardware motor PWM
+        last_pwm = pwm;
 
         if (force_hall_update) {
             hallInterrupt();
@@ -92,7 +97,7 @@ namespace sixtron {
             _sens = clockwise;
         } else if (pwm < -0.001f) {
             _sens = antiClockwise;
-        } else{
+        } else {
             _sens = none;
             force_hall_update = true;
         }
@@ -124,11 +129,19 @@ namespace sixtron {
         }
     }
 
+    int last_sector = 0;
+    int MotorBrushlessEirbot::getLastSector(){
+        return last_sector;
+    }
+
+
     void MotorBrushlessEirbot::updateTicks(uint8_t hallWord) {
         static int old_sector = 0;
         int delta, sector;
 
         sector = getSector(hallWord);
+        last_sector = sector;
+
         if (sector == -1) {
             _hall_ticks = 42;
             return; // ne devrait jamais arriver ... sinon problème de câbles HALL
@@ -148,7 +161,9 @@ namespace sixtron {
 
     void MotorBrushlessEirbot::hallInterrupt() {
         // Lecture Hall sensors
-        uint8_t hallWord = (HALL_1->read() << 2) | (HALL_2->read() << 1) | HALL_3->read();
+        uint8_t hallWord = (((HALL_1->read() != 0u) ? 1 : 0) << 2) |
+                           (((HALL_2->read() != 0u) ? 1 : 0) << 1) |
+                           (((HALL_3->read() != 0u) ? 1 : 0));
 
         // Mis à jours des ticks en fonction du secteur des halls
         updateTicks(hallWord);
