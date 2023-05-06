@@ -12,6 +12,7 @@
 #include "mbed.h"
 #include "motor/motor_DC.h"
 #include "motor_sensor_hall.h"
+#include "stm32f4xx_ll_exti.h"
 
 namespace sixtron {
 
@@ -30,7 +31,7 @@ namespace sixtron {
         bool cL;
     } halfBridge_t;
     const halfBridge_t clockwiseSequence[6] = { //  101 -> 001 -> 011 -> 010 -> 110 -> 100
-            {false, false,  true, false, false,  true}, // 0b001
+            {false, false, true,  false, false, true}, // 0b001
             {true,  false, false, true,  false, false}, // 0b010
             {true,  false, false, false, false, true},  // 0b011
             {false, true,  false, false, true,  false}, // 0b100
@@ -62,7 +63,7 @@ namespace sixtron {
                 MotorDC(rate_dt, motor_pid, max_pwm),
                 _sensor_hall(rate_dt, &_hall_ticks, sensorResolution, motorResolution, motorWheelRadius, DIR_NORMAL),
                 _motorDir(motorDir),
-                _positionMotor(motor_position){};
+                _positionMotor(motor_position) {};
 
         void setSpeed(float speed_ms) override;
 
@@ -73,11 +74,12 @@ namespace sixtron {
 
         float getSensorSpeed() override;
 
-		int32_t getHALLticks();
+        int32_t getHALLticks();
         int getLastSector();
         float getLastPWM();
 
-        MotorSensorHall* getSensorObj();
+        MotorSensorHall *getSensorObj();
+        void hallInterrupt();
 
     private:
 
@@ -85,24 +87,32 @@ namespace sixtron {
 
         int _motorDir;
 
-		void updateTicks(uint8_t hallWord);
+        uint16_t gpio_hall_u;
+        uint16_t gpio_hall_v;
+        uint16_t gpio_hall_w;
+
+//        void custom_EXTI_IRQHandler();
+
+        void updateTicks(uint8_t hallWord);
+        volatile int _last_sector = 0;
+        volatile int _old_sector = 0;
 
         TIM_TypeDef *_tim;
         position _positionMotor;
         rotationSens_t _sens;
-        InterruptIn *HALL_1;
-        InterruptIn *HALL_2;
-        InterruptIn *HALL_3;
+//        InterruptIn *HALL_1;
+//        InterruptIn *HALL_2;
+//        InterruptIn *HALL_3;
 
-        void hallInterrupt();
+
 
         void halfBridgeApply(halfBridge_t halfBridgeConfig);
 
         const halfBridge_t halfBridgeZEROS = {false, false, false, false, false, false};
         volatile uint16_t _hall_ticks;
-        PinName _pinHall_1;
-        PinName _pinHall_2;
-        PinName _pinHall_3;
+//        PinName _pinHall_1;
+//        PinName _pinHall_2;
+//        PinName _pinHall_3;
         bool force_hall_update;
     };
 

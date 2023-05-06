@@ -84,15 +84,15 @@ void motorThreadMain() {
 
         show_printf++;
 
-//        if(show_printf>1){
-//            show_printf = 0;
-//            printf("speed target=%01.3f %01.3f (ticks=%06ld) (sector=%02d) (pwm=%01.3f)\n",
-//                   target_ms,
-//                   motor_left->getSpeed(),
-//                   motor_left->getHALLticks(),
-//                   motor_left->getLastSector(),
-//                   motor_left->getLastPWM());
-//        }
+        if(show_printf>5){
+            show_printf = 0;
+            printf("speed target=%01.3f %01.3f (ticks=%06ld) (sector=%02d) (pwm=%01.3f)\n",
+                   target_ms,
+                   motor_left->getSpeed(),
+                   motor_left->getHALLticks(),
+                   motor_left->getLastSector(),
+                   motor_left->getLastPWM());
+        }
     }
 }
 
