@@ -13,7 +13,7 @@ DigitalOut led(LED1);
 //BrushlessEirbot motorL(&debugPlot, Left, 78);
 
 // Motor MBED and HALL sensorconfig
-#define MOTOR_UPDATE_RATE 20ms // 20ms for 50Hz
+#define MOTOR_UPDATE_RATE 10ms // 20ms for 50Hz
 #define MOTOR_FLAG 0x01
 #define ENC_HALL_RESOLUTION 65536 // max uint16
 #define MOTOR_RESOLUTION 48
@@ -53,7 +53,7 @@ void motorThreadMain() {
             ENC_HALL_RESOLUTION,
             WHEEL_RESOLUTION,
             WHEEL_RADIUS,
-            DIR_INVERTED,
+            DIR_NORMAL,
             MAX_PWM);
 
     motor_right = new sixtron::MotorBrushlessEirbot(
@@ -63,7 +63,7 @@ void motorThreadMain() {
             ENC_HALL_RESOLUTION,
             WHEEL_RESOLUTION,
             WHEEL_RADIUS,
-            DIR_NORMAL,
+            DIR_INVERTED,
             MAX_PWM);
 
     // Init motor and sensor
@@ -108,28 +108,29 @@ int main() {
 
     while (true) {
 
-        set_motor_target(-0.4f);
-        ThisThread::sleep_for(2s);
-
-        set_motor_target(-0.6f);
+        set_motor_target(+0.2f);
         ThisThread::sleep_for(3s);
 
-        set_motor_target(-1.0f);
-        ThisThread::sleep_for(4s);
-
-        set_motor_target(0.0f);
-        ThisThread::sleep_for(2s);
-
-        set_motor_target(-0.4f, +0.4f);
-        ThisThread::sleep_for(2s);
-
-        set_motor_target(-0.6f, +0.6f);
+        set_motor_target(-0.1f, +0.1f);
         ThisThread::sleep_for(3s);
 
-        set_motor_target(-1.0f, +1.0f);
-        ThisThread::sleep_for(4s);
 
-        set_motor_target(0.0f);
-        ThisThread::sleep_for(2s);
+//        set_motor_target(-1.0f);
+//        ThisThread::sleep_for(4s);
+//
+//        set_motor_target(0.0f);
+//        ThisThread::sleep_for(2s);
+//
+//        set_motor_target(-0.4f, +0.4f);
+//        ThisThread::sleep_for(2s);
+//
+//        set_motor_target(-0.6f, +0.6f);
+//        ThisThread::sleep_for(3s);
+//
+//        set_motor_target(-1.0f, +1.0f);
+//        ThisThread::sleep_for(4s);
+//
+//        set_motor_target(0.0f);
+//        ThisThread::sleep_for(2s);
     }
 }
