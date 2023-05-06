@@ -23,7 +23,7 @@ DigitalOut led(LED1);
 #define MAX_PWM 0.7f
 Ticker MotorUpdateTicker;
 EventFlags MotorFlag;
-Thread motorThread(osPriorityNormal);
+Thread motorThread(osPriorityRealtime);
 sixtron::MotorBrushlessEirbot *motor_left;
 sixtron::MotorBrushlessEirbot *motor_right;
 bool motor_init_done = false;

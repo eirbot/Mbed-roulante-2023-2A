@@ -115,9 +115,9 @@ namespace sixtron {
     static inline int getSector(uint8_t hallWord) {
         static const unsigned int hall_to_phase[6] = {0, 2, 1, 4, 5, 3};
 
-        if ((hallWord >= 1) && (hallWord <= 6)) { // hall value ok
+        if ((hallWord >= 1) && (hallWord <= 6)) {
             return hall_to_phase[hallWord - 1];
-        } else { // not a valid value
+        } else {
             return -1;
         }
     }
@@ -135,6 +135,7 @@ namespace sixtron {
         delta = sector - _old_sector;
         _old_sector = sector;
 
+        // delta range check
         if (delta <= -3) {
             _hall_ticks += delta + 6;
         } else if (delta >= 3) {
