@@ -20,7 +20,7 @@ DigitalOut led(LED1);
 #define MOTOR_REDUCTION 14
 #define WHEEL_RESOLUTION float(MOTOR_RESOLUTION*MOTOR_REDUCTION)
 #define WHEEL_RADIUS (0.078f/2.0f)
-#define MAX_PWM 0.6f
+#define MAX_PWM 0.7f
 Ticker MotorUpdateTicker;
 EventFlags MotorFlag;
 Thread motorThread(osPriorityNormal);
@@ -32,7 +32,6 @@ void MotorFlagUpdate() {
     MotorFlag.set(MOTOR_FLAG);
 }
 
-float target_ms;
 void motorThreadMain() {
     // First, convert the rate of the loop in seconds [float]
     auto f_secs = std::chrono::duration_cast<std::chrono::duration<float>>(MOTOR_UPDATE_RATE);
@@ -45,7 +44,7 @@ void motorThreadMain() {
     pid_motor_params.Kd = 0.0f;
     pid_motor_params.Kf = 2.0f;
     pid_motor_params.dt_seconds = dt_pid;
-    //pid_motor_params.ramp = 1.0f * dt_pid;
+    pid_motor_params.ramp = 1.0f * dt_pid;
 
     motor_left = new sixtron::MotorBrushlessEirbot(
             dt_pid,
@@ -73,7 +72,6 @@ void motorThreadMain() {
     ThisThread::sleep_for(500ms);
     motor_init_done = true;
 
-    int show_printf = 0;
     while (true) {
         // wait for the flag trigger
         MotorFlag.wait_any(MOTOR_FLAG);
@@ -81,18 +79,6 @@ void motorThreadMain() {
         // Update sensor motor
         motor_left->update();
         motor_right->update();
-
-        show_printf++;
-
-        if(show_printf>5){
-            show_printf = 0;
-            printf("speed target=%01.3f %01.3f (ticks=%06ld) (sector=%02d) (pwm=%01.3f)\n",
-                   target_ms,
-                   motor_left->getSpeed(),
-                   motor_left->getHALLticks(),
-                   motor_left->getLastSector(),
-                   motor_left->getLastPWM());
-        }
     }
 }
 
@@ -101,8 +87,12 @@ void set_motor_target(float speed_ms) {
 //    printf("Applying %2.3f m/s to the motor.\n", speed_ms);
     motor_left->setSpeed(speed_ms);
     motor_right->setSpeed(speed_ms);
-    target_ms = speed_ms;
-//    motor_left->setPWM(speed_ms);
+}
+
+void set_motor_target(float speed_left, float speed_right) {
+//    printf("Applying %2.3f m/s to the motor.\n", speed_ms);
+    motor_left->setSpeed(speed_left);
+    motor_right->setSpeed(speed_right);
 }
 
 int main() {
@@ -122,21 +112,24 @@ int main() {
         ThisThread::sleep_for(2s);
 
         set_motor_target(-0.6f);
-        ThisThread::sleep_for(1s);
+        ThisThread::sleep_for(3s);
+
+        set_motor_target(-1.0f);
+        ThisThread::sleep_for(4s);
 
         set_motor_target(0.0f);
-        ThisThread::sleep_for(1s);
-
-        set_motor_target(0.4f);
         ThisThread::sleep_for(2s);
 
-        set_motor_target(0.6f);
-        ThisThread::sleep_for(1s);
+        set_motor_target(-0.4f, +0.4f);
+        ThisThread::sleep_for(2s);
+
+        set_motor_target(-0.6f, +0.6f);
+        ThisThread::sleep_for(3s);
+
+        set_motor_target(-1.0f, +1.0f);
+        ThisThread::sleep_for(4s);
 
         set_motor_target(0.0f);
-        ThisThread::sleep_for(1s);
-
-//        set_motor_target(-0.5f);
-//        ThisThread::sleep_for(3s);
+        ThisThread::sleep_for(2s);
     }
 }

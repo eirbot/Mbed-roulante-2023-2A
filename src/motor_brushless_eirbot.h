@@ -12,7 +12,7 @@
 #include "mbed.h"
 #include "motor/motor_DC.h"
 #include "motor_sensor_hall.h"
-#include "stm32f4xx_ll_exti.h"
+//#include "stm32f4xx_ll_exti.h"
 
 namespace sixtron {
 
@@ -61,58 +61,43 @@ namespace sixtron {
                              int motorDir = DIR_NORMAL,
                              float max_pwm = DEFAULT_MOTOR_MAX_PWM) :
                 MotorDC(rate_dt, motor_pid, max_pwm),
-                _sensor_hall(rate_dt, &_hall_ticks, sensorResolution, motorResolution, motorWheelRadius, DIR_NORMAL),
+                _positionMotor(motor_position),
                 _motorDir(motorDir),
-                _positionMotor(motor_position) {};
+                _sensor_hall(rate_dt, &_hall_ticks, sensorResolution, motorResolution, motorWheelRadius, DIR_NORMAL) {};
 
         void setSpeed(float speed_ms) override;
 
-    public:
-        void initHardware() override;
-
-        void setPWM(float pwm) override;
-
-        float getSensorSpeed() override;
-
-        int32_t getHALLticks();
-        int getLastSector();
-        float getLastPWM();
-
         MotorSensorHall *getSensorObj();
-        void hallInterrupt();
+
+    protected:
+
+        void initHardware() override;
+        void setPWM(float pwm) override;
+        float getSensorSpeed() override;
 
     private:
 
-        MotorSensorHall _sensor_hall;
-
-        int _motorDir;
-
-        uint16_t gpio_hall_u;
-        uint16_t gpio_hall_v;
-        uint16_t gpio_hall_w;
-
-//        void custom_EXTI_IRQHandler();
-
-        void updateTicks(uint8_t hallWord);
-        volatile int _last_sector = 0;
-        volatile int _old_sector = 0;
-
         TIM_TypeDef *_tim;
         position _positionMotor;
+        int _motorDir;
         rotationSens_t _sens;
-//        InterruptIn *HALL_1;
-//        InterruptIn *HALL_2;
-//        InterruptIn *HALL_3;
+        InterruptIn *HALL_1;
+        InterruptIn *HALL_2;
+        InterruptIn *HALL_3;
 
+        MotorSensorHall _sensor_hall;
 
+        void hallInterrupt();
+        void updateTicks(uint8_t hallWord);
+        volatile int _old_sector = 0;
 
         void halfBridgeApply(halfBridge_t halfBridgeConfig);
 
         const halfBridge_t halfBridgeZEROS = {false, false, false, false, false, false};
         volatile uint16_t _hall_ticks;
-//        PinName _pinHall_1;
-//        PinName _pinHall_2;
-//        PinName _pinHall_3;
+        PinName _pinHall_1;
+        PinName _pinHall_2;
+        PinName _pinHall_3;
         bool force_hall_update;
     };
 

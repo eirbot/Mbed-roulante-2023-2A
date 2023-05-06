@@ -8,12 +8,7 @@
 
 
 #include "motor_brushless_eirbot.h"
-
 #include "tim.h"
-
-static sixtron::MotorBrushlessEirbot *motor_left_obj;
-static sixtron::MotorBrushlessEirbot *motor_right_obj;
-
 
 void TIMER1_init() {
     MX_TIM1_Init();
@@ -24,18 +19,6 @@ void TIMER1_init() {
     HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_2);
     HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);
     HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_3);
-
-    GPIO_InitTypeDef GPIO_InitStruct = {0};
-
-    /* GPIO Ports Clock Enable */
-    __HAL_RCC_GPIOB_CLK_ENABLE();
-
-    /* Configure HALL inputs pins */
-    GPIO_InitStruct.Pin = GPIO_PIN_2 | GPIO_PIN_5 | GPIO_PIN_6;
-    GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING_FALLING;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
 }
 
 void TIMER8_init() {
@@ -47,54 +30,6 @@ void TIMER8_init() {
     HAL_TIMEx_PWMN_Start(&htim8, TIM_CHANNEL_2);
     HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_3);
     HAL_TIMEx_PWMN_Start(&htim8, TIM_CHANNEL_3);
-
-    GPIO_InitTypeDef GPIO_InitStruct = {0};
-
-    /* GPIO Ports Clock Enable */
-    __HAL_RCC_GPIOB_CLK_ENABLE();
-
-    /* Configure HALL inputs pins */
-    GPIO_InitStruct.Pin = GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9;
-    GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING_FALLING;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-}
-
-void custom_EXTI_IRQHandler(void) {
-
-    //PB2 -> Motor Left
-    if (LL_EXTI_ReadFlag_0_31(LL_EXTI_LINE_2)) {
-        LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_2);
-        motor_left_obj->hallInterrupt();
-    }
-    //PB5 -> Motor Left
-    if (LL_EXTI_ReadFlag_0_31(LL_EXTI_LINE_5)) {
-        LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_5);
-        motor_left_obj->hallInterrupt();
-    }
-    //PB6 -> Motor Left
-    if (LL_EXTI_ReadFlag_0_31(LL_EXTI_LINE_6)) {
-        LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_6);
-        motor_left_obj->hallInterrupt();
-    }
-
-    // PB7 -> Motor Right
-    if (LL_EXTI_ReadFlag_0_31(LL_EXTI_LINE_7)) {
-        LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_7);
-        motor_right_obj->hallInterrupt();
-    }
-    // PB8 -> Motor Right
-    if (LL_EXTI_ReadFlag_0_31(LL_EXTI_LINE_8)) {
-        LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_8);
-        motor_right_obj->hallInterrupt();
-    }
-    // PB9 -> Motor Right
-    if (LL_EXTI_ReadFlag_0_31(LL_EXTI_LINE_9)) {
-        LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_9);
-        motor_right_obj->hallInterrupt();
-    }
-
-
 }
 
 namespace sixtron {
@@ -107,86 +42,34 @@ namespace sixtron {
         // Init Motor PWM
         if (_positionMotor == left) {
             // Configuration des Hall Sensors
-//            _pinHall_1 = PB_2;
-//            _pinHall_2 = PB_5;
-//            _pinHall_3 = PB_6;
-
-            gpio_hall_u = GPIO_PIN_2;
-            gpio_hall_v = GPIO_PIN_5;
-            gpio_hall_w = GPIO_PIN_6;
+            _pinHall_1 = PB_2;
+            _pinHall_2 = PB_5;
+            _pinHall_3 = PB_6;
 
             _tim = TIM1;
             TIMER1_init();
 
-            /* EXTI interrupt init*/
-            HAL_NVIC_SetPriority(EXTI2_IRQn, 0, 0);
-            NVIC_SetVector(EXTI2_IRQn, (uint32_t) &custom_EXTI_IRQHandler);
-            HAL_NVIC_EnableIRQ(EXTI2_IRQn);
-
-            HAL_NVIC_SetPriority(EXTI9_5_IRQn, 0, 0);
-            NVIC_SetVector(EXTI9_5_IRQn, (uint32_t) &custom_EXTI_IRQHandler);
-            HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
-
-            motor_left_obj = this;
-
-//    HAL_NVIC_SetPriority(HALL_V_EXTI_IRQn, 0, 0);
-//    NVIC_SetVector(HALL_V_EXTI_IRQn, (uint32_t)&custom_EXTI_IRQHandler);
-//    HAL_NVIC_EnableIRQ(HALL_V_EXTI_IRQn);
-//
-//    HAL_NVIC_SetPriority(HALL_W_EXTI_IRQn, 0, 0); //
-//    NVIC_SetVector(HALL_W_EXTI_IRQn, (uint32_t)&custom_EXTI_IRQHandler); //
-//    HAL_NVIC_EnableIRQ(HALL_W_EXTI_IRQn); //
-
-
         } else if (_positionMotor == right) {
-//            _pinHall_1 = PB_7;
-//            _pinHall_2 = PB_8;
-//            _pinHall_3 = PB_9;
-
-            gpio_hall_u = GPIO_PIN_7;
-            gpio_hall_v = GPIO_PIN_8;
-            gpio_hall_w = GPIO_PIN_9;
+            _pinHall_1 = PB_7;
+            _pinHall_2 = PB_8;
+            _pinHall_3 = PB_9;
 
             _tim = TIM8;
             TIMER8_init();
-
-            /* EXTI interrupt init*/
-//            HAL_NVIC_SetPriority(EXTI9_5_IRQn, 0, 0);
-//            NVIC_SetVector(EXTI9_5_IRQn, (uint32_t) &custom_EXTI_IRQHandler);
-//            HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
-
-            motor_right_obj = this;
         }
 
         halfBridgeApply(halfBridgeZEROS);
 
-//        HALL_1 = new InterruptIn(_pinHall_1, PullNone);
-//        HALL_2 = new InterruptIn(_pinHall_2, PullNone);
-//        HALL_3 = new InterruptIn(_pinHall_3, PullNone);
-//        HALL_1->rise(callback(this, &MotorBrushlessEirbot::hallInterrupt));
-//        HALL_2->rise(callback(this, &MotorBrushlessEirbot::hallInterrupt));
-//        HALL_3->rise(callback(this, &MotorBrushlessEirbot::hallInterrupt));
-//        HALL_1->fall(callback(this, &MotorBrushlessEirbot::hallInterrupt));
-//        HALL_2->fall(callback(this, &MotorBrushlessEirbot::hallInterrupt));
-//        HALL_3->fall(callback(this, &MotorBrushlessEirbot::hallInterrupt));
+        HALL_1 = new InterruptIn(_pinHall_1, PullNone);
+        HALL_2 = new InterruptIn(_pinHall_2, PullNone);
+        HALL_3 = new InterruptIn(_pinHall_3, PullNone);
+        HALL_1->rise(callback(this, &MotorBrushlessEirbot::hallInterrupt));
+        HALL_2->rise(callback(this, &MotorBrushlessEirbot::hallInterrupt));
+        HALL_3->rise(callback(this, &MotorBrushlessEirbot::hallInterrupt));
+        HALL_1->fall(callback(this, &MotorBrushlessEirbot::hallInterrupt));
+        HALL_2->fall(callback(this, &MotorBrushlessEirbot::hallInterrupt));
+        HALL_3->fall(callback(this, &MotorBrushlessEirbot::hallInterrupt));
     }
-
-//    void custom_EXTI_IRQHandler(void) {
-
-//        LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_0);
-//        LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_1);
-//        LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_2);
-
-    //    debug led
-    //    if (HAL_GPIO_ReadPin(LED_GPIO_Port, LED_Pin) == GPIO_PIN_RESET) {
-    //        HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
-    //    } else {
-    //        HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
-    //    }
-
-//        _motor_control_update_sector();
-//        _motor_control_update_pwm(_sector, _pwm_value);
-//    }
 
     float MotorBrushlessEirbot::getSensorSpeed() {
         _sensor_hall.update();
@@ -201,14 +84,8 @@ namespace sixtron {
         force_hall_update = true;
     }
 
-    float last_pwm = 0.0f;
-    float MotorBrushlessEirbot::getLastPWM() {
-        return last_pwm;
-    }
-
     void MotorBrushlessEirbot::setPWM(float pwm) {
         // update hardware motor PWM
-        last_pwm = pwm;
 
         if (force_hall_update) {
             hallInterrupt();
@@ -221,7 +98,6 @@ namespace sixtron {
             _sens = antiClockwise;
         } else {
             _sens = none;
-//            force_hall_update = true;
         }
 
         // Conversion vers uint8_t
@@ -236,11 +112,6 @@ namespace sixtron {
 
     }
 
-    // @deprecated
-    int32_t MotorBrushlessEirbot::getHALLticks() {
-        return _hall_ticks;
-    }
-
     static inline int getSector(uint8_t hallWord) {
         static const unsigned int hall_to_phase[6] = {0, 2, 1, 4, 5, 3};
 
@@ -251,21 +122,13 @@ namespace sixtron {
         }
     }
 
-
-    int MotorBrushlessEirbot::getLastSector() {
-        return _last_sector;
-    }
-
-
     void MotorBrushlessEirbot::updateTicks(uint8_t hallWord) {
-//        static int old_sector = 0;
         int delta, sector;
 
         sector = getSector(hallWord);
-        _last_sector = sector;
 
         if (sector == -1) {
-            _hall_ticks = 42;
+//            _hall_ticks = 42;
             return; // ne devrait jamais arriver ... sinon problème de câbles HALL
         }
 
@@ -283,19 +146,15 @@ namespace sixtron {
 
     void MotorBrushlessEirbot::hallInterrupt() {
         // Lecture Hall sensors
-//        uint8_t hallWord = (((HALL_1->read() != 0u) ? 1 : 0) << 2) |
-//                           (((HALL_2->read() != 0u) ? 1 : 0) << 1) |
-//                           (((HALL_3->read() != 0u) ? 1 : 0));
-
-        uint8_t hallWord = ((((GPIOB->IDR & gpio_hall_u) != 0u) ? 1 : 0) << 2) |
-                           ((((GPIOB->IDR & gpio_hall_v) != 0u) ? 1 : 0) << 1) |
-                           ((((GPIOB->IDR & gpio_hall_w) != 0u) ? 1 : 0));
+        uint8_t hallWord = (((HALL_1->read() != 0u) ? 1 : 0) << 2) |
+                           (((HALL_2->read() != 0u) ? 1 : 0) << 1) |
+                           (((HALL_3->read() != 0u) ? 1 : 0));
 
         // Mis à jours des ticks en fonction du secteur des halls
         updateTicks(hallWord);
 
         // Affectation de la séquence d'après
-        halfBridge_t halfBridge = {false, false, false, false, false, false};
+        halfBridge_t halfBridge;
         if (_sens == clockwise) {
             halfBridge = clockwiseSequence[hallWord - 1];
         } else if (_sens == antiClockwise) {
