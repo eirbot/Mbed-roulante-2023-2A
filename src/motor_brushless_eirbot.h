@@ -20,7 +20,7 @@
 
 namespace sixtron {
 
-    enum position {
+    enum motor_position {
         left, right
     };
     enum rotationSens_t {
@@ -57,7 +57,7 @@ namespace sixtron {
 
     public:
         MotorBrushlessEirbot(float rate_dt,
-                             position motor_position,
+                             motor_position motor_pos,
                              PID_params motor_pid,
                              int32_t sensorResolution,
                              float motorResolution,
@@ -65,15 +65,16 @@ namespace sixtron {
                              int motorDir = DIR_NORMAL,
                              float max_pwm = DEFAULT_MOTOR_MAX_PWM) :
                 MotorDC(rate_dt, motor_pid, max_pwm),
-                _positionMotor(motor_position),
+                _positionMotor(motor_pos),
                 _motorDir(motorDir),
                 _sensor_hall(rate_dt, &_hall_ticks_fixed, sensorResolution, motorResolution, motorWheelRadius, DIR_NORMAL) {};
 
         void setSpeed(float speed_ms) override;
 
         MotorSensorHall *getSensorObj();
+        void updateHallSensor();
 
-        float getLastPWM();
+        // Should be protected, but need to be public when using STM32 HAL functions.
         void hallInterrupt();
 
     protected:
@@ -85,7 +86,7 @@ namespace sixtron {
     private:
 
         TIM_TypeDef *_tim;
-        position _positionMotor;
+        motor_position _positionMotor;
         int _motorDir;
         rotationSens_t _sens;
 

@@ -167,9 +167,12 @@ namespace sixtron {
 #endif
     }
 
-    float MotorBrushlessEirbot::getSensorSpeed() {
+    void MotorBrushlessEirbot::updateHallSensor(){
         _hall_ticks_fixed = _hall_ticks; // need to fix the value when doing calculs, because of interrupts
         _sensor_hall.update();
+    }
+
+    float MotorBrushlessEirbot::getSensorSpeed() {
         return _sensor_hall.getSpeed();
     }
 
@@ -182,15 +185,9 @@ namespace sixtron {
         force_hall_update = true;
     }
 
-    float last_pwm = 0.0f;
-    float MotorBrushlessEirbot::getLastPWM(){
-        return last_pwm;
-    }
-
     void MotorBrushlessEirbot::setPWM(float pwm) {
         // update hardware motor PWM
 
-        last_pwm = pwm;
         if (force_hall_update && ((pwm >= FORCE_HALL_MIN_PWM) || (pwm <= FORCE_HALL_MIN_PWM))) {
 //        if (force_hall_update) {
             hallInterrupt();

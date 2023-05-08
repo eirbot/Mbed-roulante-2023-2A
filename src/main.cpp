@@ -3,6 +3,7 @@
 //#include "BrushlessEirbot.hpp"
 //#include "SerialPlot.hpp"
 #include "motor_brushless_eirbot.h"
+#include "odometry_eirbot.h"
 
 // ============= DEFINITIONS =================
 DigitalOut led(LED1);
@@ -19,7 +20,7 @@ DigitalOut led(LED1);
 #define MOTOR_RESOLUTION 48
 #define MOTOR_REDUCTION 14
 #define WHEEL_RESOLUTION float(MOTOR_RESOLUTION*MOTOR_REDUCTION)
-#define WHEEL_RADIUS (0.078f/2.0f)
+#define WHEEL_RADIUS (0.080f/2.0f)
 #define MAX_PWM 0.7f
 Ticker MotorUpdateTicker;
 EventFlags MotorFlag;
@@ -27,6 +28,10 @@ Thread motorThread(osPriorityRealtime);
 sixtron::MotorBrushlessEirbot *motor_left;
 sixtron::MotorBrushlessEirbot *motor_right;
 bool motor_init_done = false;
+
+// Odometry
+#define WHEELS_DISTANCE 0.30f
+sixtron::OdometryEirbot *odom;
 
 void MotorFlagUpdate() {
     MotorFlag.set(MOTOR_FLAG);
@@ -36,6 +41,7 @@ void motorThreadMain() {
     // First, convert the rate of the loop in seconds [float]
     auto f_secs = std::chrono::duration_cast<std::chrono::duration<float>>(MOTOR_UPDATE_RATE);
     float dt_pid = f_secs.count();
+    float rate_hz = dt_pid / 1.0f;
 
     // Create a motor object
     sixtron::PID_params pid_motor_params;
@@ -48,7 +54,7 @@ void motorThreadMain() {
 
     motor_left = new sixtron::MotorBrushlessEirbot(
             dt_pid,
-			sixtron::position::left,
+			sixtron::motor_position::left,
 			pid_motor_params,
             ENC_HALL_RESOLUTION,
             WHEEL_RESOLUTION,
@@ -58,7 +64,7 @@ void motorThreadMain() {
 
     motor_right = new sixtron::MotorBrushlessEirbot(
             dt_pid,
-            sixtron::position::right,
+            sixtron::motor_position::right,
             pid_motor_params,
             ENC_HALL_RESOLUTION,
             WHEEL_RESOLUTION,
@@ -72,21 +78,39 @@ void motorThreadMain() {
     ThisThread::sleep_for(200ms);
     motor_left->setSpeed(0.0f);
     motor_right->setSpeed(0.0f);
+
+    // Init odometry
+    odom = new sixtron::OdometryEirbot(rate_hz,
+                                       motor_left->getSensorObj(),
+                                       motor_right->getSensorObj(),
+                                       WHEEL_RESOLUTION,
+                                       WHEEL_RADIUS,
+                                       WHEELS_DISTANCE);
+    odom->init();
+
     motor_init_done = true;
 
-//    int printf_debug_incr = 0;
+    int printf_debug_incr = 0;
     while (true) {
         // wait for the flag trigger
         MotorFlag.wait_any(MOTOR_FLAG);
+
+        // Update hall sensor counter.
+        // DO NOT UPDATE FROM getSensorObj().update() !
+         motor_left->updateHallSensor();
+        motor_right->updateHallSensor();
+
+        // Update Odom
+        odom->update();
 
         // Update sensor motor
         motor_left->update();
         motor_right->update();
 
         // debug
-//        printf_debug_incr++;
-//        if(printf_debug_incr > 5){
-//            printf_debug_incr = 0;
+        printf_debug_incr++;
+        if(printf_debug_incr > 5){
+            printf_debug_incr = 0;
 //            printf("left %6lld, %1.3f (%1.2f) right %6lld, %1.3f (%1.2f)\n",
 //                   motor_left->getSensorObj()->getTickCount(),
 //                   motor_left->getSensorObj()->getSpeed(),
@@ -94,7 +118,11 @@ void motorThreadMain() {
 //                   motor_right->getSensorObj()->getTickCount(),
 //                   motor_right->getSensorObj()->getSpeed(),
 //                   motor_left->getLastPWM());
-//        }
+            printf("Odom: x=%3.2fm, y=%3.2fm, theta=%3.2frad\n",
+                   odom->getX(),
+                   odom->getY(),
+                   odom->getTheta());
+        }
     }
 }
 
