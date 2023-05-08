@@ -174,24 +174,32 @@ namespace sixtron {
     }
 
     void MotorBrushlessEirbot::setSpeed(float speed_ms) {
-        if (_motorDir == DIR_NORMAL)
+        if (_motorDir == DIR_NORMAL) {
             _targetSpeed = speed_ms;
-        else
+        } else {
             _targetSpeed = -speed_ms;
+        }
         force_hall_update = true;
+    }
+
+    float last_pwm = 0.0f;
+    float MotorBrushlessEirbot::getLastPWM(){
+        return last_pwm;
     }
 
     void MotorBrushlessEirbot::setPWM(float pwm) {
         // update hardware motor PWM
 
-        if (force_hall_update) {
+        last_pwm = pwm;
+        if (force_hall_update && ((pwm >= FORCE_HALL_MIN_PWM) || (pwm <= FORCE_HALL_MIN_PWM))) {
+//        if (force_hall_update) {
             hallInterrupt();
             force_hall_update = false;
         }
 
-        if (pwm > 0.001f) {
+        if (pwm > 0.01f) {
             _sens = clockwise;
-        } else if (pwm < -0.001f) {
+        } else if (pwm < -0.01f) {
             _sens = antiClockwise;
         } else {
             _sens = none;

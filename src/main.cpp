@@ -13,7 +13,7 @@ DigitalOut led(LED1);
 //BrushlessEirbot motorL(&debugPlot, Left, 78);
 
 // Motor MBED and HALL sensorconfig
-#define MOTOR_UPDATE_RATE 20ms // 20ms for 50Hz
+#define MOTOR_UPDATE_RATE 10ms // 10ms for 100Hz
 #define MOTOR_FLAG 0x01
 #define ENC_HALL_RESOLUTION 256 // max uint8
 #define MOTOR_RESOLUTION 48
@@ -40,9 +40,9 @@ void motorThreadMain() {
     // Create a motor object
     sixtron::PID_params pid_motor_params;
     pid_motor_params.Kp = 6.0f;
-    pid_motor_params.Ki = 0.0f;
+    pid_motor_params.Ki = 10.0f;
     pid_motor_params.Kd = 0.0f;
-    pid_motor_params.Kf = 2.0f;
+    pid_motor_params.Kf = 10.0f;
     pid_motor_params.dt_seconds = dt_pid;
     pid_motor_params.ramp = 1.0f * dt_pid;
 
@@ -69,10 +69,12 @@ void motorThreadMain() {
     // Init motor and sensor
     motor_left->init();
     motor_right->init();
-    ThisThread::sleep_for(500ms);
+    ThisThread::sleep_for(200ms);
+    motor_left->setSpeed(0.0f);
+    motor_right->setSpeed(0.0f);
     motor_init_done = true;
 
-    int printf_debug_incr = 0;
+//    int printf_debug_incr = 0;
     while (true) {
         // wait for the flag trigger
         MotorFlag.wait_any(MOTOR_FLAG);
@@ -82,29 +84,31 @@ void motorThreadMain() {
         motor_right->update();
 
         // debug
-        printf_debug_incr++;
-//        if(printf_debug_incr > 2){
+//        printf_debug_incr++;
+//        if(printf_debug_incr > 5){
 //            printf_debug_incr = 0;
-            printf("left %6lld, %1.3f  right %6lld, %1.3f\n",
-                   motor_left->getSensorObj()->getTickCount(),
-                   motor_left->getSensorObj()->getSpeed(),
-                   motor_right->getSensorObj()->getTickCount(),
-                   motor_right->getSensorObj()->getSpeed());
+//            printf("left %6lld, %1.3f (%1.2f) right %6lld, %1.3f (%1.2f)\n",
+//                   motor_left->getSensorObj()->getTickCount(),
+//                   motor_left->getSensorObj()->getSpeed(),
+//                   motor_left->getLastPWM(),
+//                   motor_right->getSensorObj()->getTickCount(),
+//                   motor_right->getSensorObj()->getSpeed(),
+//                   motor_left->getLastPWM());
 //        }
     }
 }
 
 // Just for the debug
-void set_motor_target(float speed_ms) {
-//    printf("Applying %2.3f m/s to the motor.\n", speed_ms);
-    motor_left->setSpeed(speed_ms);
-    motor_right->setSpeed(speed_ms);
-}
 
 void set_motor_target(float speed_left, float speed_right) {
 //    printf("Applying %2.3f m/s to the motor.\n", speed_ms);
     motor_left->setSpeed(speed_left);
     motor_right->setSpeed(speed_right);
+}
+
+void set_motor_target(float speed_ms) {
+//    printf("Applying %2.3f m/s to the motor.\n", speed_ms);
+    set_motor_target(speed_ms, speed_ms);
 }
 
 int main() {
@@ -117,32 +121,15 @@ int main() {
     printf("Waiting for the motor to be setup ...\n");
     while (!motor_init_done);
     printf("Motor init done, continue with setting targets.\n");
+    ThisThread::sleep_for(500ms);
 
     while (true) {
 
-        set_motor_target(+0.2f);
+        set_motor_target(+0.3f);
         ThisThread::sleep_for(3s);
 
-        set_motor_target(-0.1f, +0.1f);
-        ThisThread::sleep_for(3s);
+        set_motor_target(-0.2f, +0.2f);
+        ThisThread::sleep_for(2300ms);
 
-
-//        set_motor_target(-1.0f);
-//        ThisThread::sleep_for(4s);
-//
-//        set_motor_target(0.0f);
-//        ThisThread::sleep_for(2s);
-//
-//        set_motor_target(-0.4f, +0.4f);
-//        ThisThread::sleep_for(2s);
-//
-//        set_motor_target(-0.6f, +0.6f);
-//        ThisThread::sleep_for(3s);
-//
-//        set_motor_target(-1.0f, +1.0f);
-//        ThisThread::sleep_for(4s);
-//
-//        set_motor_target(0.0f);
-//        ThisThread::sleep_for(2s);
     }
 }

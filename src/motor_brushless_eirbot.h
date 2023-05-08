@@ -16,6 +16,8 @@
 
 #define USE_CUSTOM_HAL_INTERRUPT
 
+#define FORCE_HALL_MIN_PWM (0.15f)
+
 namespace sixtron {
 
     enum position {
@@ -71,6 +73,7 @@ namespace sixtron {
 
         MotorSensorHall *getSensorObj();
 
+        float getLastPWM();
         void hallInterrupt();
 
     protected:
