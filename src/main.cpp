@@ -20,10 +20,8 @@ bool motor_init_done = false;
 sixtron::OdometryEirbot *odom;
 
 // RBDC
-// PID_DV & PID_THETA PRECISION
-// #define PID_TETA_PRECISION  0.0872665f // 5°
-#define PID_TETA_PRECISION 0.017453f // 1°
-#define PID_DV_PRECISION 0.005f // 0.5 cm
+#define PID_TETA_PRECISION  0.0872665f // 5°
+#define PID_DV_PRECISION 0.01f // 1 cm
 sixtron::RBDC *rbdc_eirbot;
 sixtron::RBDC_params rbdc_eirbot_params;
 float robot_target_X = 0.0f, robot_target_Y = 0.0f, robot_target_theta = 0.0f;
@@ -35,18 +33,18 @@ void MotorFlagUpdate() {
 
 void motorThreadMain() {
     // First, convert the rate of the loop in seconds [float]
-    auto f_secs = std::chrono::duration_cast<std::chrono::duration<float>>(MOTOR_UPDATE_RATE);
+    auto f_secs = std::chrono::duration_cast<std::chrono::duration<float>>(
+            MOTOR_UPDATE_RATE);
     float dt_pid = f_secs.count();
     float rate_hz = dt_pid / 1.0f;
 
-    // Create Eirbot Base. this will create and init both brushless motors + hall sensors.
+    // Init motor base. This will create and init both brushless motors + hall sensors.
     base_eirbot = new sixtron::MotorBaseEirbot(dt_pid);
     base_eirbot->init();
 
     // Init odometry
     odom = new sixtron::OdometryEirbot(rate_hz,
-                                       base_eirbot->getSensorObj(MOTOR_LEFT),
-                                       base_eirbot->getSensorObj(MOTOR_RIGHT),
+                                       base_eirbot,
                                        WHEEL_RESOLUTION,
                                        WHEEL_RADIUS,
                                        WHEELS_DISTANCE);
@@ -54,21 +52,21 @@ void motorThreadMain() {
 
     // Init RBDC
     rbdc_eirbot_params.rbdc_format = sixtron::RBDC_format::two_wheels_robot;
-    rbdc_eirbot_params.max_output_dv = MAX_PWM - 0.2f;
-    rbdc_eirbot_params.max_output_dtheta = MAX_PWM + 0.2f;
+    rbdc_eirbot_params.max_output_dv = MAX_PWM - 0.1f;
+    rbdc_eirbot_params.max_output_dtheta = MAX_PWM + 0.1f;
     rbdc_eirbot_params.can_go_backward = true;
     rbdc_eirbot_params.dt_seconds = dt_pid;
     rbdc_eirbot_params.final_theta_precision = PID_TETA_PRECISION;
     rbdc_eirbot_params.moving_theta_precision = 3 * PID_TETA_PRECISION;
-    rbdc_eirbot_params.target_precision = 2 * PID_DV_PRECISION;
+    rbdc_eirbot_params.target_precision = 3 * PID_DV_PRECISION;
     rbdc_eirbot_params.dv_precision = PID_DV_PRECISION;
 
-    rbdc_eirbot_params.pid_param_dteta.Kp = 10.0f;
-    rbdc_eirbot_params.pid_param_dteta.Ki = 0.0f;
+    rbdc_eirbot_params.pid_param_dteta.Kp = 8.0f;
+    rbdc_eirbot_params.pid_param_dteta.Ki = 0.001f;
     rbdc_eirbot_params.pid_param_dteta.Kd = 0.0f;
 
-    rbdc_eirbot_params.pid_param_dv.Kp = 3.6f;
-    rbdc_eirbot_params.pid_param_dv.Ki = 0.0f;
+    rbdc_eirbot_params.pid_param_dv.Kp = 3.5f;
+    rbdc_eirbot_params.pid_param_dv.Ki = 0.001f;
     rbdc_eirbot_params.pid_param_dv.Kd = 0.0f;
     //    rbdc_poki_params.pid_param_dv.ramp = 0.5f * dt_pid;
 
@@ -76,7 +74,9 @@ void motorThreadMain() {
                                     base_eirbot,
                                     rbdc_eirbot_params); // will init odom and robot base as well
     sixtron::position target_pos;
+    rbdc_eirbot->start();
 
+    // Wait and Done
     ThisThread::sleep_for(200ms);
     motor_init_done = true;
 
@@ -84,15 +84,6 @@ void motorThreadMain() {
     while (true) {
         // wait for the flag trigger
         MotorFlag.wait_any(MOTOR_FLAG);
-
-        // Update hall sensors
-        base_eirbot->updateHalls();
-
-//        // Update Odom
-//        odom->update();
-//
-//        // Update motors
-//        base_eirbot->update();
 
         // Update Target
         target_pos.x = robot_target_X;
@@ -127,25 +118,10 @@ int main() {
     printf("Motor init done, continue with setting targets.\n");
     ThisThread::sleep_for(500ms);
 
-//    sixtron::target_speeds target;
-//    target.cmd_lin = 0.0f;
-//    target.cmd_rot = 0.0f;
-
-
     int square_state = 0;
     while (true) {
 
-//        target.cmd_lin = 0.2f;
-//        target.cmd_rot = 0.0f;
-//        base_eirbot->setTargetSpeeds(target);
-//        ThisThread::sleep_for(2s);
-//
-//        target.cmd_lin = 0.0f;
-//        target.cmd_rot = 0.785f;
-//        base_eirbot->setTargetSpeeds(target);
-//        ThisThread::sleep_for(2s);
-
-        // Do a square indefinitely
+        // Do the Holy Square indefinitely
 //        if (rbdc_result == sixtron::RBDC_status::RBDC_done) {
 //            square_state++;
 //
@@ -179,7 +155,7 @@ int main() {
 //            }
 //        }
 
-        ThisThread::sleep_for(100ms);
 
+        ThisThread::sleep_for(100ms);
     }
 }

@@ -64,12 +64,14 @@ namespace sixtron {
         _motor_left->update();
         _motor_right->update();
     }
+
     void MotorBaseEirbot::updateHalls() {
         // Update hall sensor counter.
         // DO NOT UPDATE FROM getSensorObj().update() !
         _motor_left->updateHallSensor();
         _motor_right->updateHallSensor();
     }
+
     MotorSensorHall *MotorBaseEirbot::getSensorObj(int motor) {
 
         if (motor == MOTOR_LEFT) {

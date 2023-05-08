@@ -26,11 +26,11 @@ namespace sixtron {
 #define MAX_PWM 0.7f // With MBED, pwm command between -1.0f and +1.0f max !
 #define WHEELS_DISTANCE 0.30f
 
-    class MotorBaseEirbot: public MotorBaseTwoWheels {
+    class MotorBaseEirbot : public MotorBaseTwoWheels {
 
     public:
         MotorBaseEirbot(
-                float rate_dt):
+                float rate_dt) :
                 MotorBaseTwoWheels(WHEELS_DISTANCE),
                 _dt_pid(rate_dt) {};
 
