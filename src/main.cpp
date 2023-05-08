@@ -2,6 +2,7 @@
 #include "mbed.h"
 #include "odometry_eirbot.h"
 #include "motor_base_eirbot.h"
+#include "rbdc.h"
 
 // ============= DEFINITIONS =================
 DigitalOut led(LED1);
@@ -17,6 +18,16 @@ bool motor_init_done = false;
 
 // Odometry
 sixtron::OdometryEirbot *odom;
+
+// RBDC
+// PID_DV & PID_THETA PRECISION
+// #define PID_TETA_PRECISION  0.0872665f // 5°
+#define PID_TETA_PRECISION 0.017453f // 1°
+#define PID_DV_PRECISION 0.005f // 0.5 cm
+sixtron::RBDC *rbdc_eirbot;
+sixtron::RBDC_params rbdc_eirbot_params;
+float robot_target_X = 0.0f, robot_target_Y = 0.0f, robot_target_theta = 0.0f;
+int rbdc_result;
 
 void MotorFlagUpdate() {
     MotorFlag.set(MOTOR_FLAG);
@@ -41,6 +52,31 @@ void motorThreadMain() {
                                        WHEELS_DISTANCE);
     odom->init();
 
+    // Init RBDC
+    rbdc_eirbot_params.rbdc_format = sixtron::RBDC_format::two_wheels_robot;
+    rbdc_eirbot_params.max_output_dv = MAX_PWM - 0.2f;
+    rbdc_eirbot_params.max_output_dtheta = MAX_PWM + 0.2f;
+    rbdc_eirbot_params.can_go_backward = true;
+    rbdc_eirbot_params.dt_seconds = dt_pid;
+    rbdc_eirbot_params.final_theta_precision = PID_TETA_PRECISION;
+    rbdc_eirbot_params.moving_theta_precision = 3 * PID_TETA_PRECISION;
+    rbdc_eirbot_params.target_precision = 2 * PID_DV_PRECISION;
+    rbdc_eirbot_params.dv_precision = PID_DV_PRECISION;
+
+    rbdc_eirbot_params.pid_param_dteta.Kp = 10.0f;
+    rbdc_eirbot_params.pid_param_dteta.Ki = 0.0f;
+    rbdc_eirbot_params.pid_param_dteta.Kd = 0.0f;
+
+    rbdc_eirbot_params.pid_param_dv.Kp = 3.6f;
+    rbdc_eirbot_params.pid_param_dv.Ki = 0.0f;
+    rbdc_eirbot_params.pid_param_dv.Kd = 0.0f;
+    //    rbdc_poki_params.pid_param_dv.ramp = 0.5f * dt_pid;
+
+    rbdc_eirbot = new sixtron::RBDC(odom,
+                                    base_eirbot,
+                                    rbdc_eirbot_params); // will init odom and robot base as well
+    sixtron::position target_pos;
+
     ThisThread::sleep_for(200ms);
     motor_init_done = true;
 
@@ -52,15 +88,24 @@ void motorThreadMain() {
         // Update hall sensors
         base_eirbot->updateHalls();
 
-        // Update Odom
-        odom->update();
+//        // Update Odom
+//        odom->update();
+//
+//        // Update motors
+//        base_eirbot->update();
 
-        // Update motors
-        base_eirbot->update();
+        // Update Target
+        target_pos.x = robot_target_X;
+        target_pos.y = robot_target_Y;
+        target_pos.theta = robot_target_theta;
+        rbdc_eirbot->setTarget(target_pos);
+
+        // Update RBDC (this will update odometry and motor base)
+        rbdc_result = rbdc_eirbot->update();
 
         // debug
         printf_debug_incr++;
-        if(printf_debug_incr > 5){
+        if (printf_debug_incr > 5) {
             printf_debug_incr = 0;
             printf("Odom: x=%3.2fm, y=%3.2fm, theta=%3.2frad\n",
                    odom->getX(),
@@ -82,21 +127,59 @@ int main() {
     printf("Motor init done, continue with setting targets.\n");
     ThisThread::sleep_for(500ms);
 
-    sixtron::target_speeds target;
-    target.cmd_lin = 0.0f;
-    target.cmd_rot = 0.0f;
+//    sixtron::target_speeds target;
+//    target.cmd_lin = 0.0f;
+//    target.cmd_rot = 0.0f;
 
+
+    int square_state = 0;
     while (true) {
 
-        target.cmd_lin = 0.2f;
-        target.cmd_rot = 0.0f;
-        base_eirbot->setTargetSpeeds(target);
-        ThisThread::sleep_for(2s);
+//        target.cmd_lin = 0.2f;
+//        target.cmd_rot = 0.0f;
+//        base_eirbot->setTargetSpeeds(target);
+//        ThisThread::sleep_for(2s);
+//
+//        target.cmd_lin = 0.0f;
+//        target.cmd_rot = 0.785f;
+//        base_eirbot->setTargetSpeeds(target);
+//        ThisThread::sleep_for(2s);
 
-        target.cmd_lin = 0.0f;
-        target.cmd_rot = 0.785f;
-        base_eirbot->setTargetSpeeds(target);
-        ThisThread::sleep_for(2s);
+        // Do a square indefinitely
+//        if (rbdc_result == sixtron::RBDC_status::RBDC_done) {
+//            square_state++;
+//
+//            switch (square_state) {
+//                case 1:
+//                    robot_target_X = 0.0f;
+//                    robot_target_Y = 0.0f;
+//                    robot_target_theta = 0.0f;
+//                    break;
+//                case 2:
+//                    robot_target_X = 0.5f;
+//                    robot_target_Y = 0.0f;
+//                    robot_target_theta = -1.57f;
+//                    break;
+//                case 3:
+//                    robot_target_X = 0.5f;
+//                    robot_target_Y = -0.5f;
+//                    robot_target_theta = -3.14f;
+//                    break;
+//                case 4:
+//                    robot_target_X = 0.0f;
+//                    robot_target_Y = -0.5f;
+//                    robot_target_theta = +1.57f;
+//                    break;
+//                default:
+//                    robot_target_X = 0.0f;
+//                    robot_target_Y = 0.0f;
+//                    robot_target_theta = 0.0f;
+//                    square_state = 1;
+//                    break;
+//            }
+//        }
+
+        ThisThread::sleep_for(100ms);
 
     }
 }
