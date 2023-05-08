@@ -1,3 +1,5 @@
+RBDC-package/motor/*
+
 /* Bootloader */
 mbed-os/features/FEATURE_BOOTLOADER/*
 
