@@ -168,6 +168,7 @@ namespace sixtron {
     }
 
     float MotorBrushlessEirbot::getSensorSpeed() {
+        _hall_ticks_fixed = _hall_ticks; // need to fix the value when doing calculs, because of interrupts
         _sensor_hall.update();
         return _sensor_hall.getSpeed();
     }

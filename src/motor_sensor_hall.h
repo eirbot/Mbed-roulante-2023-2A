@@ -20,7 +20,7 @@ namespace sixtron {
     class MotorSensorHall : public MotorSensorEncoder {
     public:
         MotorSensorHall(float rate_dt,
-                        volatile uint16_t *hall_ticks,
+                        uint8_t *hall_ticks,
                         int32_t sensorResolution,
                         float motorResolution,
                         float motorWheelRadius,
@@ -35,7 +35,7 @@ namespace sixtron {
 
     private:
 
-        volatile uint16_t *_motor_hall_ticks;
+        uint8_t *_motor_hall_ticks;
 
     };
 

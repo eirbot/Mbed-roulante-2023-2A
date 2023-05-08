@@ -65,7 +65,7 @@ namespace sixtron {
                 MotorDC(rate_dt, motor_pid, max_pwm),
                 _positionMotor(motor_position),
                 _motorDir(motorDir),
-                _sensor_hall(rate_dt, &_hall_ticks, sensorResolution, motorResolution, motorWheelRadius, DIR_NORMAL) {};
+                _sensor_hall(rate_dt, &_hall_ticks_fixed, sensorResolution, motorResolution, motorWheelRadius, DIR_NORMAL) {};
 
         void setSpeed(float speed_ms) override;
 
@@ -107,7 +107,8 @@ namespace sixtron {
         void halfBridgeApply(halfBridge_t halfBridgeConfig);
 
         const halfBridge_t halfBridgeZEROS = {false, false, false, false, false, false};
-        volatile uint16_t _hall_ticks;
+        volatile uint8_t _hall_ticks;
+        uint8_t _hall_ticks_fixed;
 
         bool force_hall_update;
     };

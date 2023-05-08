@@ -13,9 +13,9 @@ DigitalOut led(LED1);
 //BrushlessEirbot motorL(&debugPlot, Left, 78);
 
 // Motor MBED and HALL sensorconfig
-#define MOTOR_UPDATE_RATE 10ms // 20ms for 50Hz
+#define MOTOR_UPDATE_RATE 20ms // 20ms for 50Hz
 #define MOTOR_FLAG 0x01
-#define ENC_HALL_RESOLUTION 65536 // max uint16
+#define ENC_HALL_RESOLUTION 256 // max uint8
 #define MOTOR_RESOLUTION 48
 #define MOTOR_REDUCTION 14
 #define WHEEL_RESOLUTION float(MOTOR_RESOLUTION*MOTOR_REDUCTION)
@@ -40,7 +40,7 @@ void motorThreadMain() {
     // Create a motor object
     sixtron::PID_params pid_motor_params;
     pid_motor_params.Kp = 6.0f;
-    pid_motor_params.Ki = 10.0f;
+    pid_motor_params.Ki = 0.0f;
     pid_motor_params.Kd = 0.0f;
     pid_motor_params.Kf = 2.0f;
     pid_motor_params.dt_seconds = dt_pid;
@@ -72,6 +72,7 @@ void motorThreadMain() {
     ThisThread::sleep_for(500ms);
     motor_init_done = true;
 
+    int printf_debug_incr = 0;
     while (true) {
         // wait for the flag trigger
         MotorFlag.wait_any(MOTOR_FLAG);
@@ -79,6 +80,17 @@ void motorThreadMain() {
         // Update sensor motor
         motor_left->update();
         motor_right->update();
+
+        // debug
+        printf_debug_incr++;
+//        if(printf_debug_incr > 2){
+//            printf_debug_incr = 0;
+            printf("left %6lld, %1.3f  right %6lld, %1.3f\n",
+                   motor_left->getSensorObj()->getTickCount(),
+                   motor_left->getSensorObj()->getSpeed(),
+                   motor_right->getSensorObj()->getTickCount(),
+                   motor_right->getSensorObj()->getSpeed());
+//        }
     }
 }
 

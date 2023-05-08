@@ -15,7 +15,7 @@ namespace sixtron {
     }
 
     uint16_t MotorSensorHall::getSensorValue() {
-        return *_motor_hall_ticks;
+        return uint16_t(*_motor_hall_ticks);
     }
 
 } // namespace sixtron
