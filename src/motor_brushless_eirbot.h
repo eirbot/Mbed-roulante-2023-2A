@@ -14,6 +14,8 @@
 #include "motor_sensor_hall.h"
 #include "stm32f4xx_ll_exti.h"
 
+#define USE_CUSTOM_HAL_INTERRUPT
+
 namespace sixtron {
 
     enum position {
@@ -83,15 +85,21 @@ namespace sixtron {
         position _positionMotor;
         int _motorDir;
         rotationSens_t _sens;
-//        InterruptIn *HALL_1;
-//        InterruptIn *HALL_2;
-//        InterruptIn *HALL_3;
+
+#ifdef  USE_CUSTOM_HAL_INTERRUPT
         uint16_t gpio_hall_u;
         uint16_t gpio_hall_v;
         uint16_t gpio_hall_w;
+#else
+        PinName _pinHall_1;
+        PinName _pinHall_2;
+        PinName _pinHall_3;
+        InterruptIn *HALL_1;
+        InterruptIn *HALL_2;
+        InterruptIn *HALL_3;
+#endif
 
         MotorSensorHall _sensor_hall;
-
 
         void updateTicks(uint8_t hallWord);
         volatile int _old_sector = 0;
@@ -100,9 +108,7 @@ namespace sixtron {
 
         const halfBridge_t halfBridgeZEROS = {false, false, false, false, false, false};
         volatile uint16_t _hall_ticks;
-//        PinName _pinHall_1;
-//        PinName _pinHall_2;
-//        PinName _pinHall_3;
+
         bool force_hall_update;
     };
 
