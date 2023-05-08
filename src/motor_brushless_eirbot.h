@@ -115,6 +115,7 @@ namespace sixtron {
         uint8_t _hall_ticks_fixed;
 
         bool force_hall_update;
+        float _last_speed;
     };
 
 }; // namespace sixtron

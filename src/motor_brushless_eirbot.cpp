@@ -182,14 +182,16 @@ namespace sixtron {
         } else {
             _targetSpeed = -speed_ms;
         }
-        force_hall_update = true;
+        if(speed_ms != _last_speed){
+            force_hall_update = true;
+        }
+        _last_speed = speed_ms;
     }
 
     void MotorBrushlessEirbot::setPWM(float pwm) {
         // update hardware motor PWM
 
         if (force_hall_update && ((pwm >= FORCE_HALL_MIN_PWM) || (pwm <= FORCE_HALL_MIN_PWM))) {
-//        if (force_hall_update) {
             hallInterrupt();
             force_hall_update = false;
         }
