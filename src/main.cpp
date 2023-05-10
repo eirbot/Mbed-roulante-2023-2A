@@ -21,7 +21,7 @@ sixtron::OdometryEirbot *odom;
 
 // RBDC
 #define PID_TETA_PRECISION  0.0872665f // 5°
-#define PID_DV_PRECISION 0.01f // 1 cm
+#define PID_DV_PRECISION 0.03f // 3 cm
 sixtron::RBDC *rbdc_eirbot;
 sixtron::RBDC_params rbdc_eirbot_params;
 float robot_target_X = 0.0f, robot_target_Y = 0.0f, robot_target_theta = 0.0f;
@@ -52,21 +52,21 @@ void motorThreadMain() {
 
     // Init RBDC
     rbdc_eirbot_params.rbdc_format = sixtron::RBDC_format::two_wheels_robot;
-    rbdc_eirbot_params.max_output_dv = MAX_PWM - 0.1f;
-    rbdc_eirbot_params.max_output_dtheta = MAX_PWM + 0.1f;
+    rbdc_eirbot_params.max_output_dv = MAX_PWM - 0.3f;
+    rbdc_eirbot_params.max_output_dtheta = MAX_PWM + 0.2f;
     rbdc_eirbot_params.can_go_backward = true;
     rbdc_eirbot_params.dt_seconds = dt_pid;
     rbdc_eirbot_params.final_theta_precision = PID_TETA_PRECISION;
     rbdc_eirbot_params.moving_theta_precision = 3 * PID_TETA_PRECISION;
-    rbdc_eirbot_params.target_precision = 3 * PID_DV_PRECISION;
+    rbdc_eirbot_params.target_precision = 2 * PID_DV_PRECISION;
     rbdc_eirbot_params.dv_precision = PID_DV_PRECISION;
 
-    rbdc_eirbot_params.pid_param_dteta.Kp = 8.0f;
-    rbdc_eirbot_params.pid_param_dteta.Ki = 0.001f;
+    rbdc_eirbot_params.pid_param_dteta.Kp = 12.0f;
+    rbdc_eirbot_params.pid_param_dteta.Ki = 0.1f;
     rbdc_eirbot_params.pid_param_dteta.Kd = 0.0f;
 
-    rbdc_eirbot_params.pid_param_dv.Kp = 3.5f;
-    rbdc_eirbot_params.pid_param_dv.Ki = 0.001f;
+    rbdc_eirbot_params.pid_param_dv.Kp = 0.8f;
+    rbdc_eirbot_params.pid_param_dv.Ki = 0.0f;
     rbdc_eirbot_params.pid_param_dv.Kd = 0.0f;
     //    rbdc_poki_params.pid_param_dv.ramp = 0.5f * dt_pid;
 
@@ -77,7 +77,7 @@ void motorThreadMain() {
     rbdc_eirbot->start();
 
     // Wait and Done
-    ThisThread::sleep_for(200ms);
+    ThisThread::sleep_for(500ms);
     motor_init_done = true;
 
     int printf_debug_incr = 0;
@@ -116,44 +116,60 @@ int main() {
     printf("Waiting for the motor to be setup ...\n");
     while (!motor_init_done);
     printf("Motor init done, continue with setting targets.\n");
-    ThisThread::sleep_for(500ms);
+    ThisThread::sleep_for(1000ms);
 
     int square_state = 0;
     while (true) {
 
         // Do the Holy Square indefinitely
-//        if (rbdc_result == sixtron::RBDC_status::RBDC_done) {
-//            square_state++;
+        if (rbdc_result == sixtron::RBDC_status::RBDC_done) {
+            square_state++;
+
+            switch (square_state) {
+                case 1:
+                    robot_target_X = 0.0f;
+                    robot_target_Y = 0.0f;
+                    robot_target_theta = 0.0f;
+                    break;
+                case 2:
+                    robot_target_X = 0.5f;
+                    robot_target_Y = 0.0f;
+                    robot_target_theta = -1.57f;
+                    break;
+                case 3:
+                    robot_target_X = 0.5f;
+                    robot_target_Y = -0.5f;
+                    robot_target_theta = -3.14f;
+                    break;
+                case 4:
+                    robot_target_X = 0.0f;
+                    robot_target_Y = -0.5f;
+                    robot_target_theta = +1.57f;
+                    break;
+                default:
+                    robot_target_X = 0.0f;
+                    robot_target_Y = 0.0f;
+                    robot_target_theta = 0.0f;
+                    square_state = 1;
+                    break;
+            }
+        }
+
+
+//        robot_target_X = 0.0f;
+//        robot_target_Y = 0.0f;
+//        robot_target_theta = -2.00f;
 //
-//            switch (square_state) {
-//                case 1:
-//                    robot_target_X = 0.0f;
-//                    robot_target_Y = 0.0f;
-//                    robot_target_theta = 0.0f;
-//                    break;
-//                case 2:
-//                    robot_target_X = 0.5f;
-//                    robot_target_Y = 0.0f;
-//                    robot_target_theta = -1.57f;
-//                    break;
-//                case 3:
-//                    robot_target_X = 0.5f;
-//                    robot_target_Y = -0.5f;
-//                    robot_target_theta = -3.14f;
-//                    break;
-//                case 4:
-//                    robot_target_X = 0.0f;
-//                    robot_target_Y = -0.5f;
-//                    robot_target_theta = +1.57f;
-//                    break;
-//                default:
-//                    robot_target_X = 0.0f;
-//                    robot_target_Y = 0.0f;
-//                    robot_target_theta = 0.0f;
-//                    square_state = 1;
-//                    break;
-//            }
-//        }
+//        while(rbdc_result != sixtron::RBDC_status::RBDC_done);
+//        ThisThread::sleep_for(6s);
+//
+//        robot_target_X = 0.0f;
+//        robot_target_Y = 0.0f;
+//        robot_target_theta = 0.0f;
+//
+//        while(rbdc_result != sixtron::RBDC_status::RBDC_done);
+//        ThisThread::sleep_for(6s);
+
 
 
         ThisThread::sleep_for(100ms);
