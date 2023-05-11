@@ -10,8 +10,9 @@
 #define ODOMETRY_EIRBOT_H
 
 #include "mbed.h"
-#include "motor_brushless_eirbot.h"
 #include "odometry/odometry_two_encoders.h"
+#include "motor_brushless_eirbot.h"
+#include "motor_base_eirbot.h"
 
 namespace sixtron {
 
@@ -19,8 +20,7 @@ namespace sixtron {
 
     public:
         OdometryEirbot(float rate_hz,
-                       MotorSensorEncoder *left,
-                       MotorSensorEncoder *right,
+                       sixtron::MotorBaseEirbot *base,
                        float wheel_resolution,
                        float motor_wheel_radius,
                        float wheels_distance) :
@@ -28,8 +28,7 @@ namespace sixtron {
                                     wheel_resolution,
                                     motor_wheel_radius,
                                     wheels_distance),
-                _left(left),
-                _right(right) {};
+                _motor_base(base) {};
 
         ~OdometryEirbot() = default;
 
@@ -40,8 +39,7 @@ namespace sixtron {
         void update() override;
 
     private:
-        MotorSensorEncoder *_left;
-        MotorSensorEncoder *_right;
+        MotorBaseEirbot *_motor_base;
     };
 }
 

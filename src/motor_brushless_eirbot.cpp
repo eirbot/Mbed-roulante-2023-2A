@@ -63,6 +63,7 @@ void TIMER8_init() {
 }
 
 #ifdef  USE_CUSTOM_HAL_INTERRUPT
+
 void custom_EXTI_IRQHandler(void) {
 
     //PB2 -> Motor Left
@@ -97,6 +98,7 @@ void custom_EXTI_IRQHandler(void) {
         motor_right_obj->hallInterrupt();
     }
 }
+
 #endif
 
 namespace sixtron {
@@ -167,7 +169,7 @@ namespace sixtron {
 #endif
     }
 
-    void MotorBrushlessEirbot::updateHallSensor(){
+    void MotorBrushlessEirbot::updateHallSensor() {
         _hall_ticks_fixed = _hall_ticks; // need to fix the value when doing calculs, because of interrupts
         _sensor_hall.update();
     }
@@ -182,14 +184,17 @@ namespace sixtron {
         } else {
             _targetSpeed = -speed_ms;
         }
-        force_hall_update = true;
+        if (speed_ms != _last_speed) {
+            force_hall_update = true;
+        }
+        _last_speed = speed_ms;
     }
 
     void MotorBrushlessEirbot::setPWM(float pwm) {
         // update hardware motor PWM
 
-        if (force_hall_update && ((pwm >= FORCE_HALL_MIN_PWM) || (pwm <= FORCE_HALL_MIN_PWM))) {
-//        if (force_hall_update) {
+        if (force_hall_update &&
+            ((pwm >= FORCE_HALL_MIN_PWM) || (pwm <= FORCE_HALL_MIN_PWM))) {
             hallInterrupt();
             force_hall_update = false;
         }

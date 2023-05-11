@@ -16,7 +16,7 @@
 
 #define USE_CUSTOM_HAL_INTERRUPT
 
-#define FORCE_HALL_MIN_PWM (0.15f)
+#define FORCE_HALL_MIN_PWM (0.10f)
 
 namespace sixtron {
 
@@ -67,11 +67,13 @@ namespace sixtron {
                 MotorDC(rate_dt, motor_pid, max_pwm),
                 _positionMotor(motor_pos),
                 _motorDir(motorDir),
-                _sensor_hall(rate_dt, &_hall_ticks_fixed, sensorResolution, motorResolution, motorWheelRadius, DIR_NORMAL) {};
+                _sensor_hall(rate_dt, &_hall_ticks_fixed, sensorResolution,
+                             motorResolution, motorWheelRadius, DIR_NORMAL) {};
 
         void setSpeed(float speed_ms) override;
 
         MotorSensorHall *getSensorObj();
+
         void updateHallSensor();
 
         // Should be protected, but need to be public when using STM32 HAL functions.
@@ -80,7 +82,9 @@ namespace sixtron {
     protected:
 
         void initHardware() override;
+
         void setPWM(float pwm) override;
+
         float getSensorSpeed() override;
 
     private:
@@ -106,15 +110,18 @@ namespace sixtron {
         MotorSensorHall _sensor_hall;
 
         void updateTicks(uint8_t hallWord);
+
         volatile int _old_sector = 0;
 
         void halfBridgeApply(halfBridge_t halfBridgeConfig);
 
-        const halfBridge_t halfBridgeZEROS = {false, false, false, false, false, false};
+        const halfBridge_t halfBridgeZEROS = {false, false, false, false, false,
+                                              false};
         volatile uint8_t _hall_ticks;
         uint8_t _hall_ticks_fixed;
 
         bool force_hall_update;
+        float _last_speed;
     };
 
 }; // namespace sixtron

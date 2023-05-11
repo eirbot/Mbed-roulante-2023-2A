@@ -17,7 +17,11 @@ namespace sixtron {
 
     void OdometryEirbot::update() {
 
+        // Update Halls sensors
+        _motor_base->updateHalls();
+
         // right is inverted !!
-        compute(_left->getTickCount(), - _right->getTickCount());
+        compute(_motor_base->getSensorObj(MOTOR_LEFT)->getTickCount(),
+                -_motor_base->getSensorObj(MOTOR_RIGHT)->getTickCount());
     }
 }

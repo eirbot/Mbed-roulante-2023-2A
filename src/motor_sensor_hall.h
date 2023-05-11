@@ -25,7 +25,8 @@ namespace sixtron {
                         float motorResolution,
                         float motorWheelRadius,
                         int encDirection = DIR_NORMAL) :
-                MotorSensorEncoder(rate_dt, sensorResolution, motorResolution, motorWheelRadius, encDirection),
+                MotorSensorEncoder(rate_dt, sensorResolution, motorResolution,
+                                   motorWheelRadius, encDirection),
                 _motor_hall_ticks(hall_ticks) {};
 
     protected:
