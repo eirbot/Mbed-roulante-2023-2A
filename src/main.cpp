@@ -57,18 +57,18 @@ void motorThreadMain() {
     rbdc_eirbot_params.can_go_backward = true;
     rbdc_eirbot_params.dt_seconds = dt_pid;
     rbdc_eirbot_params.final_theta_precision = PID_TETA_PRECISION;
-    rbdc_eirbot_params.moving_theta_precision = 3 * PID_TETA_PRECISION;
-    rbdc_eirbot_params.target_precision = 2 * PID_DV_PRECISION;
+    rbdc_eirbot_params.moving_theta_precision = 2 * PID_TETA_PRECISION;
+    rbdc_eirbot_params.target_precision = 2.5f * PID_DV_PRECISION;
     rbdc_eirbot_params.dv_precision = PID_DV_PRECISION;
 
-    rbdc_eirbot_params.pid_param_dteta.Kp = 12.0f;
-    rbdc_eirbot_params.pid_param_dteta.Ki = 0.1f;
+    rbdc_eirbot_params.pid_param_dteta.Kp = 7.0f;
+    rbdc_eirbot_params.pid_param_dteta.Ki = 0.5f;
     rbdc_eirbot_params.pid_param_dteta.Kd = 0.0f;
 
     rbdc_eirbot_params.pid_param_dv.Kp = 0.8f;
-    rbdc_eirbot_params.pid_param_dv.Ki = 0.0f;
+    rbdc_eirbot_params.pid_param_dv.Ki = 0.01f;
     rbdc_eirbot_params.pid_param_dv.Kd = 0.0f;
-    //    rbdc_poki_params.pid_param_dv.ramp = 0.5f * dt_pid;
+    rbdc_eirbot_params.pid_param_dv.ramp = 0.4f * dt_pid;
 
     rbdc_eirbot = new sixtron::RBDC(odom,
                                     base_eirbot,
