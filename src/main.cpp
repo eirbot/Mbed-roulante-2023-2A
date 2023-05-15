@@ -1,12 +1,32 @@
 // ============= INCLUDES =================
 #include "mbed.h"
+<<<<<<< Updated upstream
 #include "odometry_eirbot.h"
 #include "motor_base_eirbot.h"
 #include "rbdc.h"
+=======
+#include "motor_brushless_eirbot.h"
+#include "odometry_eirbot.h"
+#include "constantes.h"
+>>>>>>> Stashed changes
 
-// ============= DEFINITIONS =================
+// ============= Définition =================
+InterruptIn fdc_fl(PIN_FDC_FL, PullDown);
+InterruptIn fdc_fr(PIN_FDC_FR, PullDown);
+InterruptIn fdc_bl(PIN_FDC_BL, PullDown);
+InterruptIn fdc_br(PIN_FDC_BR, PullDown);
+
+InterruptIn danger_lidar(PIN_DANGER);
+InterruptIn avertissement_lidar(PIN_AVERTISSEMENT);
+
+DigitalIn tirette(PIN_TIRETTE);
+
+DigitalOut deguisement(PIN_FUNNY_SERVOS);
+DigitalOut canon(PIN_CANON);
+DigitalOut pince(PIN_PINCE_SERVOS);
 DigitalOut led(LED1);
 
+<<<<<<< Updated upstream
 // Motor MBED and HALL sensorconfig
 #define MOTOR_UPDATE_RATE 10ms // 10ms for 100Hz
 #define MOTOR_FLAG 0x01
@@ -14,6 +34,15 @@ Ticker MotorUpdateTicker;
 EventFlags MotorFlag;
 Thread motorThread(osPriorityRealtime);
 sixtron::MotorBaseEirbot *base_eirbot;
+=======
+// ============= TUDOR =================
+Ticker MotorUpdateTicker;
+EventFlags MotorFlag;
+Thread motorThread(osPriorityRealtime);
+
+sixtron::MotorBrushlessEirbot *motor_left;
+sixtron::MotorBrushlessEirbot *motor_right;
+>>>>>>> Stashed changes
 bool motor_init_done = false;
 
 // Odometry
@@ -106,20 +135,39 @@ void motorThreadMain() {
     }
 }
 
+<<<<<<< Updated upstream
+=======
+// Just for the debug
+void set_motor_target(float speed_left, float speed_right) {
+//    printf("Applying %2.3f m/s to the motor.\n", speed_ms);
+    motor_left->setSpeed(speed_left);
+    motor_right->setSpeed(speed_right);
+}
+void set_motor_target(float speed_ms) {
+//    printf("Applying %2.3f m/s to the motor.\n", speed_ms);
+    set_motor_target(speed_ms, speed_ms);
+}
+
+>>>>>>> Stashed changes
 int main() {
     // Start the thread for motor control
     motorThread.start(motorThreadMain);
-
     // Setup ticker to update the motor base flag at exactly the defined rate
     MotorUpdateTicker.attach(&MotorFlagUpdate, MOTOR_UPDATE_RATE);
 
-    printf("Waiting for the motor to be setup ...\n");
+    // Waiting for the motor to be setup ...
     while (!motor_init_done);
+<<<<<<< Updated upstream
     printf("Motor init done, continue with setting targets.\n");
     ThisThread::sleep_for(1000ms);
+=======
+    // Motor init done, continue with setting targets
+    ThisThread::sleep_for(500ms);
+>>>>>>> Stashed changes
 
     int square_state = 0;
     while (true) {
+<<<<<<< Updated upstream
 
         // Do the Holy Square indefinitely
         if (rbdc_result == sixtron::RBDC_status::RBDC_done) {
@@ -173,5 +221,12 @@ int main() {
 
 
         ThisThread::sleep_for(100ms);
+=======
+        set_motor_target(+0.3f);
+        ThisThread::sleep_for(3s);
+
+        set_motor_target(-0.2f, +0.2f);
+        ThisThread::sleep_for(2300ms);
+>>>>>>> Stashed changes
     }
 }
