@@ -68,7 +68,7 @@ ADD_DEFINITIONS(
   -DDEVICE_STDIO_MESSAGES=1
   -DDEVICE_USTICKER=1
   -DDEVICE_WATCHDOG=1
-  -DMBED_BUILD_TIMESTAMP=1680527443.08834
+  -DMBED_BUILD_TIMESTAMP=1684142281.0905077
   -DSTM32F446xx
   -DTARGET_CORTEX
   -DTARGET_CORTEX_M
@@ -98,6 +98,9 @@ ADD_DEFINITIONS(
   -D__MBED__=1
   )
 INCLUDE_DIRECTORIES(
+  src
+  motor/motor
+  motor
   mbed-os/targets/TARGET_STM/TARGET_STM32F4/TARGET_STM32F446xE/TARGET_NUCLEO_F446RE
   mbed-os/targets/TARGET_STM/TARGET_STM32F4/TARGET_STM32F446xE
   mbed-os/targets/TARGET_STM/TARGET_STM32F4/STM32Cube_FW/STM32F4xx_HAL_Driver/Legacy
@@ -175,14 +178,36 @@ INCLUDE_DIRECTORIES(
   lib/Controllers
   lib/BrushlessEirbot
   lib
+  RBDC-package/pid/pid
+  RBDC-package/pid
+  RBDC-package/odometry/odometry
+  RBDC-package/odometry
+  RBDC-package/motor-sensor/motor_sensor
+  RBDC-package/motor-sensor
+  RBDC-package/motor-base/motor_base
+  RBDC-package/motor-base
+  RBDC-package/RBDC/RBDC
+  RBDC-package/RBDC
+  RBDC-package
   C:/Users/leova/OneDrive/Eirbot/Coupe 23/eirbot-2023-2A/roulante/Mbed/mbed-os
   .
   )
 
 # executable Mbed
 ADD_EXECUTABLE(Mbed
-  lib/BrushlessEirbot/BrushlessEirbot.cpp
-  lib/BrushlessEirbot/BrushlessEirbot.hpp
+  RBDC-package/RBDC/RBDC/RBDC.h
+  RBDC-package/RBDC/src/RBDC.cpp
+  RBDC-package/motor-base/motor_base/motor_base.h
+  RBDC-package/motor-base/motor_base/motor_base_two_wheels.h
+  RBDC-package/motor-base/src/motor_base_two_wheels.cpp
+  RBDC-package/motor-sensor/motor_sensor/motor_sensor.h
+  RBDC-package/motor-sensor/motor_sensor/motor_sensor_encoder.h
+  RBDC-package/motor-sensor/src/motor_sensor_encoder.cpp
+  RBDC-package/odometry/odometry/odometry.h
+  RBDC-package/odometry/odometry/odometry_two_encoders.h
+  RBDC-package/odometry/src/odometry_two_encoders.cpp
+  RBDC-package/pid/pid/pid.h
+  RBDC-package/pid/src/pid.cpp
   lib/BrushlessEirbot/tim.c
   lib/BrushlessEirbot/tim.h
   lib/Controllers/Controller.cpp
@@ -888,6 +913,7 @@ ADD_EXECUTABLE(Mbed
   mbed-os/targets/TARGET_STM/serial_api_hal.h
   mbed-os/targets/TARGET_STM/sleep.c
   mbed-os/targets/TARGET_STM/stm32_assert.h
+  mbed-os/targets/TARGET_STM/stm_i2c_api.h
   mbed-os/targets/TARGET_STM/stm_spi_api.c
   mbed-os/targets/TARGET_STM/trng_api.c
   mbed-os/targets/TARGET_STM/us_ticker.c
@@ -895,7 +921,17 @@ ADD_EXECUTABLE(Mbed
   mbed-os/targets/TARGET_STM/watchdog_api.c
   mbed_config.h
   mbed_config.h
+  motor/motor/motor.h
+  motor/motor/motor_DC.h
+  motor/src/motor_DC.cpp
+  src/constantes.h
   src/main.cpp
+  src/motor_brushless_eirbot.cpp
+  src/motor_brushless_eirbot.h
+  src/motor_sensor_hall.cpp
+  src/motor_sensor_hall.h
+  src/odometry_eirbot.cpp
+  src/odometry_eirbot.h
   )
 SET_TARGET_PROPERTIES(Mbed PROPERTIES ENABLE_EXPORTS 1)
 # add syslibs dependencies to create the correct linker order
