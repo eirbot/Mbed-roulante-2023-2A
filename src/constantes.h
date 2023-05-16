@@ -6,12 +6,13 @@
 #define PIN_AVERTISSEMENT	PA_12
 #define TX_LIDAR	    	PD_2
 #define RX_LIDAR	    	PC_12
-#define PIN_PINCE_SERVOS	PA_0
+#define PIN_PINCE_SERVOS_1	PA_0
+#define PIN_PINCE_SERVOS_2	PA_5
 #define PIN_FUNNY_SERVOS	PA_4
-#define PIN_FDC_FL          PA_15
-#define PIN_FDC_FR	        PB_4
-#define PIN_FDC_BL		    PA_6
-#define PIN_FDC_BR	    	PA_11
+#define PIN_FDC_BL          PA_15
+#define PIN_FDC_BR	        PB_4
+#define PIN_FDC_FL		    PA_6
+#define PIN_FDC_FR	    	PA_11
 #define PIN_TIRETTE	        PA_1
 
 
@@ -25,6 +26,9 @@
 #define WHEEL_RADIUS (0.080f/2.0f)
 #define MAX_PWM 0.7f
 #define WHEELS_DISTANCE 0.30f
+
+#define PID_TETA_PRECISION  0.0872665f // 5°
+#define PID_DV_PRECISION 0.03f // 3 cm
 
 
 

@@ -1,56 +1,41 @@
 // ============= INCLUDES =================
 #include "mbed.h"
-<<<<<<< Updated upstream
 #include "odometry_eirbot.h"
 #include "motor_base_eirbot.h"
 #include "rbdc.h"
-=======
 #include "motor_brushless_eirbot.h"
 #include "odometry_eirbot.h"
 #include "constantes.h"
->>>>>>> Stashed changes
 
 // ============= Définition =================
-InterruptIn fdc_fl(PIN_FDC_FL, PullDown);
-InterruptIn fdc_fr(PIN_FDC_FR, PullDown);
-InterruptIn fdc_bl(PIN_FDC_BL, PullDown);
-InterruptIn fdc_br(PIN_FDC_BR, PullDown);
+DigitalIn fdc_fl(PIN_FDC_FL, PullDown);
+DigitalIn fdc_fr(PIN_FDC_FR, PullDown);
+DigitalIn fdc_bl(PIN_FDC_BL, PullDown);
+DigitalIn fdc_br(PIN_FDC_BR, PullDown);
 
-InterruptIn danger_lidar(PIN_DANGER);
-InterruptIn avertissement_lidar(PIN_AVERTISSEMENT);
+DigitalIn danger_lidar(PIN_DANGER);
+DigitalIn avertissement_lidar(PIN_AVERTISSEMENT);
 
-DigitalIn tirette(PIN_TIRETTE);
+DigitalIn tirette(PIN_TIRETTE, PullDown);
 
 DigitalOut deguisement(PIN_FUNNY_SERVOS);
 DigitalOut canon(PIN_CANON);
-DigitalOut pince(PIN_PINCE_SERVOS);
+DigitalOut pince1(PIN_PINCE_SERVOS_1);
+DigitalOut pince2(PIN_PINCE_SERVOS_2);
 DigitalOut led(LED1);
 
-<<<<<<< Updated upstream
+
 // Motor MBED and HALL sensorconfig
-#define MOTOR_UPDATE_RATE 10ms // 10ms for 100Hz
-#define MOTOR_FLAG 0x01
 Ticker MotorUpdateTicker;
 EventFlags MotorFlag;
 Thread motorThread(osPriorityRealtime);
 sixtron::MotorBaseEirbot *base_eirbot;
-=======
-// ============= TUDOR =================
-Ticker MotorUpdateTicker;
-EventFlags MotorFlag;
-Thread motorThread(osPriorityRealtime);
-
 sixtron::MotorBrushlessEirbot *motor_left;
 sixtron::MotorBrushlessEirbot *motor_right;
->>>>>>> Stashed changes
 bool motor_init_done = false;
-
 // Odometry
 sixtron::OdometryEirbot *odom;
-
 // RBDC
-#define PID_TETA_PRECISION  0.0872665f // 5°
-#define PID_DV_PRECISION 0.03f // 3 cm
 sixtron::RBDC *rbdc_eirbot;
 sixtron::RBDC_params rbdc_eirbot_params;
 float robot_target_X = 0.0f, robot_target_Y = 0.0f, robot_target_theta = 0.0f;
@@ -122,111 +107,96 @@ void motorThreadMain() {
 
         // Update RBDC (this will update odometry and motor base)
         rbdc_result = rbdc_eirbot->update();
-
-        // debug
-        printf_debug_incr++;
-        if (printf_debug_incr > 5) {
-            printf_debug_incr = 0;
-            printf("Odom: x=%3.2fm, y=%3.2fm, theta=%3.2frad\n",
-                   odom->getX(),
-                   odom->getY(),
-                   odom->getTheta());
-        }
     }
 }
 
-<<<<<<< Updated upstream
-=======
-// Just for the debug
-void set_motor_target(float speed_left, float speed_right) {
-//    printf("Applying %2.3f m/s to the motor.\n", speed_ms);
-    motor_left->setSpeed(speed_left);
-    motor_right->setSpeed(speed_right);
-}
-void set_motor_target(float speed_ms) {
-//    printf("Applying %2.3f m/s to the motor.\n", speed_ms);
-    set_motor_target(speed_ms, speed_ms);
+
+void fdcInterrupt() {
+    rbdc_eirbot->stop();
 }
 
->>>>>>> Stashed changes
+
 int main() {
+
+    pince1.write(0);
+    pince2.write(0);
+
     // Start the thread for motor control
     motorThread.start(motorThreadMain);
     // Setup ticker to update the motor base flag at exactly the defined rate
     MotorUpdateTicker.attach(&MotorFlagUpdate, MOTOR_UPDATE_RATE);
-
     // Waiting for the motor to be setup ...
     while (!motor_init_done);
-<<<<<<< Updated upstream
-    printf("Motor init done, continue with setting targets.\n");
-    ThisThread::sleep_for(1000ms);
-=======
-    // Motor init done, continue with setting targets
-    ThisThread::sleep_for(500ms);
->>>>>>> Stashed changes
+    ThisThread::sleep_for(1500ms);
 
-    int square_state = 0;
+    while (tirette.read());
+
+    robot_target_X = 0.2f;
+    robot_target_Y = 0.0f;
+    robot_target_theta = 0.0f;
+    while (rbdc_result != sixtron::RBDC_status::RBDC_done);
+
+    ThisThread::sleep_for(2s);
+
+
+    pince1.write(0);
+    pince2.write(1);
+    ThisThread::sleep_for(3s);
+
+    robot_target_X = -0.23f;
+    robot_target_Y = 0.0f;
+    robot_target_theta = 0.0f;
+    while (rbdc_result != sixtron::RBDC_status::RBDC_done);
+    ThisThread::sleep_for(3s);
+
+
+    pince1.write(1);
+    pince2.write(0);
+
+    ThisThread::sleep_for(4s);
+
+    pince1.write(1);
+    pince2.write(1);
+
+    robot_target_X = 0.15f;
+    robot_target_Y = 0.0f;
+    robot_target_theta = 0.0f;
+    while (rbdc_result != sixtron::RBDC_status::RBDC_done);
+
+    ThisThread::sleep_for(2s);
+
+    while (1);
+/* ******************************** LOOP ******************************** */
     while (true) {
-<<<<<<< Updated upstream
-
-        // Do the Holy Square indefinitely
-        if (rbdc_result == sixtron::RBDC_status::RBDC_done) {
-            square_state++;
-
-            switch (square_state) {
-                case 1:
-                    robot_target_X = 0.0f;
-                    robot_target_Y = 0.0f;
-                    robot_target_theta = 0.0f;
-                    break;
-                case 2:
-                    robot_target_X = 0.5f;
-                    robot_target_Y = 0.0f;
-                    robot_target_theta = -1.57f;
-                    break;
-                case 3:
-                    robot_target_X = 0.5f;
-                    robot_target_Y = -0.5f;
-                    robot_target_theta = -3.14f;
-                    break;
-                case 4:
-                    robot_target_X = 0.0f;
-                    robot_target_Y = -0.5f;
-                    robot_target_theta = +1.57f;
-                    break;
-                default:
-                    robot_target_X = 0.0f;
-                    robot_target_Y = 0.0f;
-                    robot_target_theta = 0.0f;
-                    square_state = 1;
-                    break;
-            }
-        }
 
 
-//        robot_target_X = 0.0f;
-//        robot_target_Y = 0.0f;
-//        robot_target_theta = -2.00f;
-//
-//        while(rbdc_result != sixtron::RBDC_status::RBDC_done);
-//        ThisThread::sleep_for(6s);
-//
-//        robot_target_X = 0.0f;
-//        robot_target_Y = 0.0f;
-//        robot_target_theta = 0.0f;
-//
-//        while(rbdc_result != sixtron::RBDC_status::RBDC_done);
-//        ThisThread::sleep_for(6s);
+        robot_target_X = -0.2f;
+        robot_target_Y = 0.0f;
+        robot_target_theta = 0.0f;
+        while (rbdc_result != sixtron::RBDC_status::RBDC_done) {
 
+        };
 
+        pince2 = 0;
+        pince1 = 1;
+        ThisThread::sleep_for(4s);
 
-        ThisThread::sleep_for(100ms);
-=======
-        set_motor_target(+0.3f);
-        ThisThread::sleep_for(3s);
+        robot_target_X = 0.0f;
+        robot_target_Y = 0.0f;
+        robot_target_theta = 0.0f;
+        while (rbdc_result != sixtron::RBDC_status::RBDC_done);
 
-        set_motor_target(-0.2f, +0.2f);
-        ThisThread::sleep_for(2300ms);
->>>>>>> Stashed changes
+        pince2 = 1;
+        pince1 = 0;
+        ThisThread::sleep_for(4s);
+
+        robot_target_X = 0.2f;
+        robot_target_Y = 0.0f;
+        robot_target_theta = 0.0f;
+        while (rbdc_result != sixtron::RBDC_status::RBDC_done);
+
+        pince2 = 1;
+        pince1 = 1;
+        ThisThread::sleep_for(15s);
     }
 }

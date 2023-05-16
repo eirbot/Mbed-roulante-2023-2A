@@ -68,7 +68,7 @@ ADD_DEFINITIONS(
   -DDEVICE_STDIO_MESSAGES=1
   -DDEVICE_USTICKER=1
   -DDEVICE_WATCHDOG=1
-  -DMBED_BUILD_TIMESTAMP=1684142281.0905077
+  -DMBED_BUILD_TIMESTAMP=1684181024.0892735
   -DSTM32F446xx
   -DTARGET_CORTEX
   -DTARGET_CORTEX_M
@@ -926,6 +926,8 @@ ADD_EXECUTABLE(Mbed
   motor/src/motor_DC.cpp
   src/constantes.h
   src/main.cpp
+  src/motor_base_eirbot.cpp
+  src/motor_base_eirbot.h
   src/motor_brushless_eirbot.cpp
   src/motor_brushless_eirbot.h
   src/motor_sensor_hall.cpp
