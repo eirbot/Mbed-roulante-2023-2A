@@ -43,50 +43,31 @@ volatile int rbdc_result = sixtron::RBDC_status::RBDC_standby;
 
 BufferedSerial pc(USBTX, USBRX, 115200);
 
-void print(const std::string& str){
+void print(const std::string &str) {
     pc.write(str.c_str(), str.length());
 }
 
-int16_t compteur_lidar;
+volatile int16_t compteur_lidar = 0;
 
 bool security() {
     if (tirette.read() != 1) {
         if (danger_lidar.read() || avertissement_lidar.read()) {
-            if (tirette.read() != 1) {
-                compteur_lidar++;
-            }
-        }
-        if (compteur_lidar == 5) {
-            return true;
+            compteur_lidar++;
         } else {
-            return false;
+            compteur_lidar--;
         }
     }
+    if (compteur_lidar >= 5) {
+        compteur_lidar = 5;
+        return true;
+    } else if (compteur_lidar < 0) {
+        compteur_lidar = 0;
+        return false;
+    }
+
+    return false;
 }
 
-
-
-//// incrément décrément
-//if (tirette.read() != 1) {
-//if (danger_lidar.read() || avertissement_lidar.read()) {
-//if (tirette.read() != 1 ) {
-//compteur_lidar++;
-//}
-//}
-//
-//if (compteur_lidar < 0) {
-//compteur_lidar = 0;
-//return false;
-//} else if (compteur_lidar == 5) {
-//return true;
-//} else if (compteur_lidar > 10) {
-//compteur_lidar = 5;
-//return true;
-//} else {
-//return false;
-//}
-//}
-//return false;
 
 void MotorFlagUpdate() {
     MotorFlag.set(MOTOR_FLAG);
@@ -144,14 +125,28 @@ void motorThreadMain() {
 
     int printf_debug_incr = 0;
     while (true) {
+
+        // SECRITY
+        if (tirette.read() != 1) {
+            if (danger_lidar.read() || avertissement_lidar.read()) {
+                compteur_lidar++;
+            } else {
+                compteur_lidar--;
+            }
+        }
+        if (compteur_lidar >= 5) {
+            compteur_lidar = 5;
+            rbdc_eirbot->stop();
+        } else if (compteur_lidar < 0) {
+            compteur_lidar = 0;
+            rbdc_eirbot->start();
+        }
+
+
         // wait for the flag trigger
         MotorFlag.wait_any(MOTOR_FLAG);
 
-        // SECRITY
-        bool secu = security();
-        if (secu) {
-            rbdc_eirbot->stop();
-        }
+
 
 
         // Update Target
@@ -166,19 +161,22 @@ void motorThreadMain() {
 }
 
 
-void open(){
+void open() {
     pince1.write(0);
     pince2.write(0);
 }
-void close(){
+
+void close() {
     pince1.write(0);
     pince2.write(1);
 }
-void drop(){
+
+void drop() {
     pince1.write(1);
     pince2.write(0);
 }
-void tempo(){
+
+void tempo() {
     pince1.write(1);
     pince2.write(1);
 }
@@ -186,108 +184,21 @@ void tempo(){
 
 int main() {
     std::string str;
-
+    print("Programme start\n");
     // Start the thread for motor control
     motorThread.start(motorThreadMain);
     // Setup ticker to update the motor base flag at exactly the defined rate
     MotorUpdateTicker.attach(&MotorFlagUpdate, MOTOR_UPDATE_RATE);
     // Waiting for the motor to be setup ...
     while (!motor_init_done);
+    print("Motor start\n");
+
     ThisThread::sleep_for(1500ms);
 
-    open();
 
     while (tirette.read());
 
-/* ************************** Saisie gateaux ************************** */
-
-    ThisThread::sleep_for(15s);
-
-    robot_target_X = 0.28f;
-    robot_target_Y = 0.0f;
-    robot_target_theta = 0.0f;
-    while (rbdc_result != sixtron::RBDC_status::RBDC_done);
-
-    ThisThread::sleep_for(2s);
-
-    close();
-    ThisThread::sleep_for(3s);
-
-    robot_target_X = -0.19f;
-    robot_target_Y = 0.0f;
-    robot_target_theta = 0.0f;
-    while (rbdc_result != sixtron::RBDC_status::RBDC_done);
-    ThisThread::sleep_for(3s);
-/* ************************** Gateaux 1  ************************** */
-
-    drop();
-    ThisThread::sleep_for(4s);
-
-    tempo();
-
-    robot_target_X = 0.08f;
-    robot_target_Y = 0.0f;
-    robot_target_theta = 0.0f;
-    while (rbdc_result != sixtron::RBDC_status::RBDC_done);
-    ThisThread::sleep_for(3s);
-
-    open();
-    ThisThread::sleep_for(2s);
-
-    close();
-    ThisThread::sleep_for(2s);
-
-/* ************************** Gateaux 2  ************************** */
-    drop();
-    ThisThread::sleep_for(2s);
-
-    tempo();
-    ThisThread::sleep_for(2s);
-
-    robot_target_X = 0.28f;
-    robot_target_Y = 0.0f;
-    robot_target_theta = 0.0f;
-    while (rbdc_result != sixtron::RBDC_status::RBDC_done);
-    ThisThread::sleep_for(2s);
-
-    open();
-    ThisThread::sleep_for(2s);
-
-    close();
-    ThisThread::sleep_for(2s);
-/* ************************** Gateaux 3  ************************** */
-
-    drop();
-    ThisThread::sleep_for(2s);
-
-    open();
-    ThisThread::sleep_for(2s);
-
-    robot_target_X = 0.48f;
-    robot_target_Y = 0.0f;
-    robot_target_theta = 0.0f;
-    while (rbdc_result != sixtron::RBDC_status::RBDC_done);
-    ThisThread::sleep_for(2s);
-
-    close();
-    ThisThread::sleep_for(5s);
-
-    robot_target_X = 0.09f;
-    robot_target_Y = 0.0f;
-    robot_target_theta = 0.0f;
-    while (rbdc_result != sixtron::RBDC_status::RBDC_done);
-    ThisThread::sleep_for(4s);
-
-    robot_target_X = 0.25f;
-    robot_target_Y = 0.0f;
-    robot_target_theta = 0.0f;
-    while (rbdc_result != sixtron::RBDC_status::RBDC_done);
-    ThisThread::sleep_for(3s);
-
-    open();
-    ThisThread::sleep_for(4s);
-
-    robot_target_X = 1.60f;
+    robot_target_X = 1.0f;
     robot_target_Y = 0.0f;
     robot_target_theta = 0.0f;
     while (rbdc_result != sixtron::RBDC_status::RBDC_done);
