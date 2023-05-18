@@ -41,6 +41,48 @@ sixtron::RBDC_params rbdc_eirbot_params;
 float robot_target_X = 0.0f, robot_target_Y = 0.0f, robot_target_theta = 0.0f;
 int rbdc_result;
 
+
+int16_t compteur_lidar;
+
+bool security() {
+    if (tirette.read() != 1) {
+        if (danger_lidar.read() || avertissement_lidar.read()) {
+            if (tirette.read() != 1) {
+                compteur_lidar++;
+            }
+        }
+        if (compteur_lidar == 5) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+}
+
+
+
+//// incrément décrément
+//if (tirette.read() != 1) {
+//if (danger_lidar.read() || avertissement_lidar.read()) {
+//if (tirette.read() != 1 ) {
+//compteur_lidar++;
+//}
+//}
+//
+//if (compteur_lidar < 0) {
+//compteur_lidar = 0;
+//return false;
+//} else if (compteur_lidar == 5) {
+//return true;
+//} else if (compteur_lidar > 10) {
+//compteur_lidar = 5;
+//return true;
+//} else {
+//return false;
+//}
+//}
+//return false;
+
 void MotorFlagUpdate() {
     MotorFlag.set(MOTOR_FLAG);
 }
@@ -55,6 +97,7 @@ void motorThreadMain() {
     // Init motor base. This will create and init both brushless motors + hall sensors.
     base_eirbot = new sixtron::MotorBaseEirbot(dt_pid);
     base_eirbot->init();
+
 
     // Init odometry
     odom = new sixtron::OdometryEirbot(rate_hz,
@@ -99,6 +142,13 @@ void motorThreadMain() {
         // wait for the flag trigger
         MotorFlag.wait_any(MOTOR_FLAG);
 
+        // SECRITY
+//        bool secu = security();
+//        if (secu) {
+//            rbdc_eirbot->stop();
+//        }
+
+
         // Update Target
         target_pos.x = robot_target_X;
         target_pos.y = robot_target_Y;
@@ -111,15 +161,22 @@ void motorThreadMain() {
 }
 
 
-void fdcInterrupt() {
-    rbdc_eirbot->stop();
-}
+//BufferedSerial pc(USBTX, USBRX, 115200);
+
+//void print(std::string str){
+//    pc.write(str.c_str(), str.length());
+//}
+
+
+
+
 
 
 int main() {
+    std::string str;
 
     pince1.write(0);
-    pince2.write(0);
+    pince2.write(1);
 
     // Start the thread for motor control
     motorThread.start(motorThreadMain);
@@ -129,74 +186,53 @@ int main() {
     while (!motor_init_done);
     ThisThread::sleep_for(1500ms);
 
+
     while (tirette.read());
 
-    robot_target_X = 0.2f;
+    robot_target_X = 0.35f;
     robot_target_Y = 0.0f;
     robot_target_theta = 0.0f;
     while (rbdc_result != sixtron::RBDC_status::RBDC_done);
 
-    ThisThread::sleep_for(2s);
 
+    ThisThread::sleep_for(2s);
 
     pince1.write(0);
     pince2.write(1);
     ThisThread::sleep_for(3s);
 
-    robot_target_X = -0.23f;
+    robot_target_X = 0.1f;
     robot_target_Y = 0.0f;
     robot_target_theta = 0.0f;
     while (rbdc_result != sixtron::RBDC_status::RBDC_done);
     ThisThread::sleep_for(3s);
 
 
-    pince1.write(1);
-    pince2.write(0);
+//    pince1.write(1);
+//    pince2.write(0);
+//
+//    ThisThread::sleep_for(4s);
+//
+//    pince1.write(1);
+//    pince2.write(1);
+////
+//    robot_target_X = 0.15f;
+//    robot_target_Y = 0.0f;
+//    robot_target_theta = 0.0f;
+//    while (rbdc_result != sixtron::RBDC_status::RBDC_done);
+//    ThisThread::sleep_for(2s);
+//
+//    pince1.write(0);
+//    pince2.write(0);
+//
+//    ThisThread::sleep_for(2s);
+//
 
-    ThisThread::sleep_for(4s);
-
-    pince1.write(1);
-    pince2.write(1);
-
-    robot_target_X = 0.15f;
-    robot_target_Y = 0.0f;
-    robot_target_theta = 0.0f;
-    while (rbdc_result != sixtron::RBDC_status::RBDC_done);
-
-    ThisThread::sleep_for(2s);
+//    robot_target_X = 0.50f;
+//    robot_target_Y = 0.0f;
+//    robot_target_theta = 0.0f;
+//    while (rbdc_result != sixtron::RBDC_status::RBDC_done);
+//    ThisThread::sleep_for(2s);
 
     while (1);
-/* ******************************** LOOP ******************************** */
-    while (true) {
-
-
-        robot_target_X = -0.2f;
-        robot_target_Y = 0.0f;
-        robot_target_theta = 0.0f;
-        while (rbdc_result != sixtron::RBDC_status::RBDC_done) {
-
-        };
-
-        pince2 = 0;
-        pince1 = 1;
-        ThisThread::sleep_for(4s);
-
-        robot_target_X = 0.0f;
-        robot_target_Y = 0.0f;
-        robot_target_theta = 0.0f;
-        while (rbdc_result != sixtron::RBDC_status::RBDC_done);
-
-        pince2 = 1;
-        pince1 = 0;
-        ThisThread::sleep_for(4s);
-
-        robot_target_X = 0.2f;
-        robot_target_Y = 0.0f;
-        robot_target_theta = 0.0f;
-        while (rbdc_result != sixtron::RBDC_status::RBDC_done);
-
-        pince2 = 1;
-        pince1 = 1;
-        ThisThread::sleep_for(15s);
-    }
 }
