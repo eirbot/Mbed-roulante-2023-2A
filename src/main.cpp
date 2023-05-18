@@ -48,6 +48,12 @@ void print(const std::string &str) {
 }
 
 volatile int16_t compteur_lidar = 0;
+volatile bool end_match = false;
+Timeout endMatch;
+
+void endMatchProcess(){
+    end_match = true;
+}
 
 void MotorFlagUpdate() {
     MotorFlag.set(MOTOR_FLAG);
@@ -120,6 +126,11 @@ void motorThreadMain() {
             rbdc_eirbot->start();
         }
 
+        if (end_match){
+            rbdc_eirbot->stop();
+        }
+
+
         // wait for the flag trigger
         MotorFlag.wait_any(MOTOR_FLAG);
 
@@ -168,14 +179,16 @@ int main() {
 
     // Waiting for the motor to be setup ...
     while (!motor_init_done);
-//    print("Motor start\n");
     ThisThread::sleep_for(1500ms);
 
 
     open();
     while (tirette.read());
+    endMatch.attach(endMatchProcess, 95s);
+
 /* ************************** Saisie gateaux ************************** */
-    ThisThread::sleep_for(5s);
+    ThisThread::sleep_for(1s);
+
     robot_target_X = 0.28f;
     robot_target_Y = 0.0f;
     robot_target_theta = 0.0f;
