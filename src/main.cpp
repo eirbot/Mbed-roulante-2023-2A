@@ -176,7 +176,7 @@ int main() {
     std::string str;
 
     pince1.write(0);
-    pince2.write(1);
+    pince2.write(0);
 
     // Start the thread for motor control
     motorThread.start(motorThreadMain);
@@ -189,7 +189,7 @@ int main() {
 
     while (tirette.read());
 
-    robot_target_X = 0.35f;
+    robot_target_X = 0.28f;
     robot_target_Y = 0.0f;
     robot_target_theta = 0.0f;
     while (rbdc_result != sixtron::RBDC_status::RBDC_done);
@@ -201,38 +201,38 @@ int main() {
     pince2.write(1);
     ThisThread::sleep_for(3s);
 
-    robot_target_X = 0.1f;
+    robot_target_X = -0.17f;
     robot_target_Y = 0.0f;
     robot_target_theta = 0.0f;
     while (rbdc_result != sixtron::RBDC_status::RBDC_done);
     ThisThread::sleep_for(3s);
 
 
-//    pince1.write(1);
-//    pince2.write(0);
-//
-//    ThisThread::sleep_for(4s);
-//
-//    pince1.write(1);
-//    pince2.write(1);
-////
-//    robot_target_X = 0.15f;
-//    robot_target_Y = 0.0f;
-//    robot_target_theta = 0.0f;
-//    while (rbdc_result != sixtron::RBDC_status::RBDC_done);
-//    ThisThread::sleep_for(2s);
-//
-//    pince1.write(0);
-//    pince2.write(0);
-//
-//    ThisThread::sleep_for(2s);
-//
+    pince1.write(1);
+    pince2.write(0);
 
-//    robot_target_X = 0.50f;
-//    robot_target_Y = 0.0f;
-//    robot_target_theta = 0.0f;
-//    while (rbdc_result != sixtron::RBDC_status::RBDC_done);
-//    ThisThread::sleep_for(2s);
+    ThisThread::sleep_for(4s);
+
+    pince1.write(1);
+    pince2.write(1);
+
+    robot_target_X = 0.15f;
+    robot_target_Y = 0.0f;
+    robot_target_theta = 0.0f;
+    while (rbdc_result != sixtron::RBDC_status::RBDC_done);
+    ThisThread::sleep_for(2s);
+
+    pince1.write(0);
+    pince2.write(0);
+
+    ThisThread::sleep_for(2s);
+
+
+    robot_target_X = 0.50f;
+    robot_target_Y = 0.0f;
+    robot_target_theta = 0.0f;
+    while (rbdc_result != sixtron::RBDC_status::RBDC_done);
+    ThisThread::sleep_for(2s);
 
     while (1);
 }
