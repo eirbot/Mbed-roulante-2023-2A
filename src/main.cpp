@@ -112,8 +112,8 @@ void motorThreadMain() {
                 compteur_lidar--;
             }
         }
-        if (compteur_lidar >= 100) {
-            compteur_lidar = 100;
+        if (compteur_lidar >= 70) {
+            compteur_lidar = 70;
             rbdc_eirbot->stop();
         } else if (compteur_lidar < 0) {
             compteur_lidar = 0;
@@ -172,98 +172,97 @@ int main() {
     ThisThread::sleep_for(1500ms);
 
 
-//    open();
+    open();
     while (tirette.read());
 /* ************************** Saisie gateaux ************************** */
-//    ThisThread::sleep_for(5s);
-    robot_target_X = 0.70f;
+    ThisThread::sleep_for(5s);
+    robot_target_X = 0.28f;
     robot_target_Y = 0.0f;
     robot_target_theta = 0.0f;
     while (rbdc_result != sixtron::RBDC_status::RBDC_done);
     ThisThread::sleep_for(5s);
 
-    robot_target_X = 0.1f;
+    close();
+    ThisThread::sleep_for(3s);
+
+    robot_target_X = -0.19f;
+    robot_target_Y = 0.0f;
+    robot_target_theta = 0.0f;
+    while (rbdc_result != sixtron::RBDC_status::RBDC_done);
+    ThisThread::sleep_for(3s);
+
+/* ************************** Gateaux 1  ************************** */
+    drop();
+    ThisThread::sleep_for(4s);
+
+    tempo();
+    robot_target_X = 0.08f;
+    robot_target_Y = 0.0f;
+    robot_target_theta = 0.0f;
+    while (rbdc_result != sixtron::RBDC_status::RBDC_done);
+    ThisThread::sleep_for(3s);
+
+    open();
+    ThisThread::sleep_for(2s);
+
+    close();
+    ThisThread::sleep_for(2s);
+
+/* ************************** Gateaux 2  ************************** */
+    drop();
+    ThisThread::sleep_for(2s);
+
+    tempo();
+    ThisThread::sleep_for(2s);
+
+    robot_target_X = 0.28f;
     robot_target_Y = 0.0f;
     robot_target_theta = 0.0f;
     while (rbdc_result != sixtron::RBDC_status::RBDC_done);
     ThisThread::sleep_for(2s);
 
-//    close();
-//    ThisThread::sleep_for(3s);
-//
-//    robot_target_X = -0.19f;
-//    robot_target_Y = 0.0f;
-//    robot_target_theta = 0.0f;
-//    while (rbdc_result != sixtron::RBDC_status::RBDC_done);
-//    ThisThread::sleep_for(3s);
-//
-///* ************************** Gateaux 1  ************************** */
-//    drop();
-//    ThisThread::sleep_for(4s);
-//
-//    tempo();
-//    robot_target_X = 0.08f;
-//    robot_target_Y = 0.0f;
-//    robot_target_theta = 0.0f;
-//    while (rbdc_result != sixtron::RBDC_status::RBDC_done);
-//    ThisThread::sleep_for(3s);
-//
-//    open();
-//    ThisThread::sleep_for(2s);
-//
-//    close();
-//    ThisThread::sleep_for(2s);
-//
-///* ************************** Gateaux 2  ************************** */
-//    drop();
-//    ThisThread::sleep_for(2s);
-//
-//    tempo();
-//    ThisThread::sleep_for(2s);
-//
-//    robot_target_X = 0.28f;
-//    robot_target_Y = 0.0f;
-//    robot_target_theta = 0.0f;
-//    while (rbdc_result != sixtron::RBDC_status::RBDC_done);
-//    ThisThread::sleep_for(2s);
-//
-//    open();
-//    ThisThread::sleep_for(2s);
-//
-//    close();
-//    ThisThread::sleep_for(2s);
-//
-///* ************************** Gateaux 3  ************************** */
-//    drop();
-//    ThisThread::sleep_for(2s);
-//
-//    open();
-//    ThisThread::sleep_for(2s);
-//
-//    robot_target_X = 0.48f;
-//    robot_target_Y = 0.0f;
-//    robot_target_theta = 0.0f;
-//    while (rbdc_result != sixtron::RBDC_status::RBDC_done);
-//
-//    ThisThread::sleep_for(2s);
-//    close();
-//    ThisThread::sleep_for(5s);
-//    robot_target_X = 0.09f;
-//    robot_target_Y = 0.0f;
-//    robot_target_theta = 0.0f;
-//    while (rbdc_result != sixtron::RBDC_status::RBDC_done);
-//    ThisThread::sleep_for(4s);
-//    robot_target_X = 0.25f;
-//    robot_target_Y = 0.0f;
-//    robot_target_theta = 0.0f;
-//    while (rbdc_result != sixtron::RBDC_status::RBDC_done);
-//    ThisThread::sleep_for(3s);
-//    open();
-//    ThisThread::sleep_for(4s);
-//    robot_target_X = 1.60f;
-//    robot_target_Y = 0.0f;
-//    robot_target_theta = 0.0f;
-//    while (rbdc_result != sixtron::RBDC_status::RBDC_done);
+    open();
+    ThisThread::sleep_for(2s);
+
+    close();
+    ThisThread::sleep_for(2s);
+
+/* ************************** Gateaux 3  ************************** */
+    drop();
+    ThisThread::sleep_for(2s);
+
+    open();
+    ThisThread::sleep_for(2s);
+
+    robot_target_X = 0.48f;
+    robot_target_Y = 0.0f;
+    robot_target_theta = 0.0f;
+    while (rbdc_result != sixtron::RBDC_status::RBDC_done);
+
+    ThisThread::sleep_for(2s);
+
+    close();
+    ThisThread::sleep_for(5s);
+
+    robot_target_X = 0.09f;
+    robot_target_Y = 0.0f;
+    robot_target_theta = 0.0f;
+    while (rbdc_result != sixtron::RBDC_status::RBDC_done);
+    ThisThread::sleep_for(4s);
+
+    robot_target_X = 0.25f;
+    robot_target_Y = 0.0f;
+    robot_target_theta = 0.0f;
+    while (rbdc_result != sixtron::RBDC_status::RBDC_done);
+    ThisThread::sleep_for(3s);
+
+    open();
+    ThisThread::sleep_for(4s);
+
+    robot_target_X = 1.60f;
+    robot_target_Y = 0.0f;
+    robot_target_theta = 0.0f;
+    while (rbdc_result != sixtron::RBDC_status::RBDC_done);
     while (1);
 
 }
