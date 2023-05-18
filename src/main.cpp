@@ -49,26 +49,6 @@ void print(const std::string &str) {
 
 volatile int16_t compteur_lidar = 0;
 
-bool security() {
-    if (tirette.read() != 1) {
-        if (danger_lidar.read() || avertissement_lidar.read()) {
-            compteur_lidar++;
-        } else {
-            compteur_lidar--;
-        }
-    }
-    if (compteur_lidar >= 5) {
-        compteur_lidar = 5;
-        return true;
-    } else if (compteur_lidar < 0) {
-        compteur_lidar = 0;
-        return false;
-    }
-
-    return false;
-}
-
-
 void MotorFlagUpdate() {
     MotorFlag.set(MOTOR_FLAG);
 }
@@ -120,34 +100,28 @@ void motorThreadMain() {
     rbdc_eirbot->start();
 
     // Wait and Done
-    ThisThread::sleep_for(500ms);
+    ThisThread::sleep_for(1500ms);
     motor_init_done = true;
 
-    int printf_debug_incr = 0;
     while (true) {
-
-        // SECRITY
+        // SECURITY
         if (tirette.read() != 1) {
             if (danger_lidar.read() || avertissement_lidar.read()) {
-                compteur_lidar++;
+                compteur_lidar+=20;
             } else {
                 compteur_lidar--;
             }
         }
-        if (compteur_lidar >= 5) {
-            compteur_lidar = 5;
+        if (compteur_lidar >= 100) {
+            compteur_lidar = 100;
             rbdc_eirbot->stop();
         } else if (compteur_lidar < 0) {
             compteur_lidar = 0;
             rbdc_eirbot->start();
         }
 
-
         // wait for the flag trigger
         MotorFlag.wait_any(MOTOR_FLAG);
-
-
-
 
         // Update Target
         target_pos.x = robot_target_X;
@@ -184,24 +158,112 @@ void tempo() {
 
 int main() {
     std::string str;
-    print("Programme start\n");
+//    print("Programme start\n");
     // Start the thread for motor control
     motorThread.start(motorThreadMain);
+    ThisThread::sleep_for(10ms);
+
     // Setup ticker to update the motor base flag at exactly the defined rate
     MotorUpdateTicker.attach(&MotorFlagUpdate, MOTOR_UPDATE_RATE);
+
     // Waiting for the motor to be setup ...
     while (!motor_init_done);
-    print("Motor start\n");
-
+//    print("Motor start\n");
     ThisThread::sleep_for(1500ms);
 
 
+//    open();
     while (tirette.read());
-
-    robot_target_X = 1.0f;
+/* ************************** Saisie gateaux ************************** */
+//    ThisThread::sleep_for(5s);
+    robot_target_X = 0.70f;
     robot_target_Y = 0.0f;
     robot_target_theta = 0.0f;
     while (rbdc_result != sixtron::RBDC_status::RBDC_done);
+    ThisThread::sleep_for(5s);
 
+    robot_target_X = 0.1f;
+    robot_target_Y = 0.0f;
+    robot_target_theta = 0.0f;
+    while (rbdc_result != sixtron::RBDC_status::RBDC_done);
+    ThisThread::sleep_for(2s);
+
+//    close();
+//    ThisThread::sleep_for(3s);
+//
+//    robot_target_X = -0.19f;
+//    robot_target_Y = 0.0f;
+//    robot_target_theta = 0.0f;
+//    while (rbdc_result != sixtron::RBDC_status::RBDC_done);
+//    ThisThread::sleep_for(3s);
+//
+///* ************************** Gateaux 1  ************************** */
+//    drop();
+//    ThisThread::sleep_for(4s);
+//
+//    tempo();
+//    robot_target_X = 0.08f;
+//    robot_target_Y = 0.0f;
+//    robot_target_theta = 0.0f;
+//    while (rbdc_result != sixtron::RBDC_status::RBDC_done);
+//    ThisThread::sleep_for(3s);
+//
+//    open();
+//    ThisThread::sleep_for(2s);
+//
+//    close();
+//    ThisThread::sleep_for(2s);
+//
+///* ************************** Gateaux 2  ************************** */
+//    drop();
+//    ThisThread::sleep_for(2s);
+//
+//    tempo();
+//    ThisThread::sleep_for(2s);
+//
+//    robot_target_X = 0.28f;
+//    robot_target_Y = 0.0f;
+//    robot_target_theta = 0.0f;
+//    while (rbdc_result != sixtron::RBDC_status::RBDC_done);
+//    ThisThread::sleep_for(2s);
+//
+//    open();
+//    ThisThread::sleep_for(2s);
+//
+//    close();
+//    ThisThread::sleep_for(2s);
+//
+///* ************************** Gateaux 3  ************************** */
+//    drop();
+//    ThisThread::sleep_for(2s);
+//
+//    open();
+//    ThisThread::sleep_for(2s);
+//
+//    robot_target_X = 0.48f;
+//    robot_target_Y = 0.0f;
+//    robot_target_theta = 0.0f;
+//    while (rbdc_result != sixtron::RBDC_status::RBDC_done);
+//
+//    ThisThread::sleep_for(2s);
+//    close();
+//    ThisThread::sleep_for(5s);
+//    robot_target_X = 0.09f;
+//    robot_target_Y = 0.0f;
+//    robot_target_theta = 0.0f;
+//    while (rbdc_result != sixtron::RBDC_status::RBDC_done);
+//    ThisThread::sleep_for(4s);
+//    robot_target_X = 0.25f;
+//    robot_target_Y = 0.0f;
+//    robot_target_theta = 0.0f;
+//    while (rbdc_result != sixtron::RBDC_status::RBDC_done);
+//    ThisThread::sleep_for(3s);
+//    open();
+//    ThisThread::sleep_for(4s);
+//    robot_target_X = 1.60f;
+//    robot_target_Y = 0.0f;
+//    robot_target_theta = 0.0f;
+//    while (rbdc_result != sixtron::RBDC_status::RBDC_done);
     while (1);
+
 }
