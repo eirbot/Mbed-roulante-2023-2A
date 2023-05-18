@@ -39,8 +39,13 @@ sixtron::OdometryEirbot *odom;
 sixtron::RBDC *rbdc_eirbot;
 sixtron::RBDC_params rbdc_eirbot_params;
 float robot_target_X = 0.0f, robot_target_Y = 0.0f, robot_target_theta = 0.0f;
-int rbdc_result;
+volatile int rbdc_result = sixtron::RBDC_status::RBDC_standby;
 
+BufferedSerial pc(USBTX, USBRX, 115200);
+
+void print(const std::string& str){
+    pc.write(str.c_str(), str.length());
+}
 
 int16_t compteur_lidar;
 
@@ -143,10 +148,10 @@ void motorThreadMain() {
         MotorFlag.wait_any(MOTOR_FLAG);
 
         // SECRITY
-//        bool secu = security();
-//        if (secu) {
-//            rbdc_eirbot->stop();
-//        }
+        bool secu = security();
+        if (secu) {
+            rbdc_eirbot->stop();
+        }
 
 
         // Update Target
@@ -161,22 +166,26 @@ void motorThreadMain() {
 }
 
 
-//BufferedSerial pc(USBTX, USBRX, 115200);
-
-//void print(std::string str){
-//    pc.write(str.c_str(), str.length());
-//}
-
-
-
-
+void open(){
+    pince1.write(0);
+    pince2.write(0);
+}
+void close(){
+    pince1.write(0);
+    pince2.write(1);
+}
+void drop(){
+    pince1.write(1);
+    pince2.write(0);
+}
+void tempo(){
+    pince1.write(1);
+    pince2.write(1);
+}
 
 
 int main() {
     std::string str;
-
-    pince1.write(0);
-    pince2.write(0);
 
     // Start the thread for motor control
     motorThread.start(motorThreadMain);
@@ -186,53 +195,102 @@ int main() {
     while (!motor_init_done);
     ThisThread::sleep_for(1500ms);
 
+    open();
 
     while (tirette.read());
+
+/* ************************** Saisie gateaux ************************** */
+
+    ThisThread::sleep_for(15s);
 
     robot_target_X = 0.28f;
     robot_target_Y = 0.0f;
     robot_target_theta = 0.0f;
     while (rbdc_result != sixtron::RBDC_status::RBDC_done);
 
-
     ThisThread::sleep_for(2s);
 
-    pince1.write(0);
-    pince2.write(1);
+    close();
     ThisThread::sleep_for(3s);
 
-    robot_target_X = -0.17f;
+    robot_target_X = -0.19f;
     robot_target_Y = 0.0f;
     robot_target_theta = 0.0f;
     while (rbdc_result != sixtron::RBDC_status::RBDC_done);
     ThisThread::sleep_for(3s);
+/* ************************** Gateaux 1  ************************** */
 
-
-    pince1.write(1);
-    pince2.write(0);
-
+    drop();
     ThisThread::sleep_for(4s);
 
-    pince1.write(1);
-    pince2.write(1);
+    tempo();
 
-    robot_target_X = 0.15f;
+    robot_target_X = 0.08f;
+    robot_target_Y = 0.0f;
+    robot_target_theta = 0.0f;
+    while (rbdc_result != sixtron::RBDC_status::RBDC_done);
+    ThisThread::sleep_for(3s);
+
+    open();
+    ThisThread::sleep_for(2s);
+
+    close();
+    ThisThread::sleep_for(2s);
+
+/* ************************** Gateaux 2  ************************** */
+    drop();
+    ThisThread::sleep_for(2s);
+
+    tempo();
+    ThisThread::sleep_for(2s);
+
+    robot_target_X = 0.28f;
     robot_target_Y = 0.0f;
     robot_target_theta = 0.0f;
     while (rbdc_result != sixtron::RBDC_status::RBDC_done);
     ThisThread::sleep_for(2s);
 
-    pince1.write(0);
-    pince2.write(0);
-
+    open();
     ThisThread::sleep_for(2s);
 
+    close();
+    ThisThread::sleep_for(2s);
+/* ************************** Gateaux 3  ************************** */
 
-    robot_target_X = 0.50f;
+    drop();
+    ThisThread::sleep_for(2s);
+
+    open();
+    ThisThread::sleep_for(2s);
+
+    robot_target_X = 0.48f;
     robot_target_Y = 0.0f;
     robot_target_theta = 0.0f;
     while (rbdc_result != sixtron::RBDC_status::RBDC_done);
     ThisThread::sleep_for(2s);
+
+    close();
+    ThisThread::sleep_for(5s);
+
+    robot_target_X = 0.09f;
+    robot_target_Y = 0.0f;
+    robot_target_theta = 0.0f;
+    while (rbdc_result != sixtron::RBDC_status::RBDC_done);
+    ThisThread::sleep_for(4s);
+
+    robot_target_X = 0.25f;
+    robot_target_Y = 0.0f;
+    robot_target_theta = 0.0f;
+    while (rbdc_result != sixtron::RBDC_status::RBDC_done);
+    ThisThread::sleep_for(3s);
+
+    open();
+    ThisThread::sleep_for(4s);
+
+    robot_target_X = 1.60f;
+    robot_target_Y = 0.0f;
+    robot_target_theta = 0.0f;
+    while (rbdc_result != sixtron::RBDC_status::RBDC_done);
 
     while (1);
 }
